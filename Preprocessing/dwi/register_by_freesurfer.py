@@ -40,23 +40,28 @@ def applyxfm_fsl(in_file, xfm, ref, out_file):
 
 
 def atlas_to_subject_space(
-    func_derivatives: Path, atlas_file: Path, atlas_name: str, subj: Path
+    func_derivatives: Path,
+    atlas_file: Path,
+    atlas_name: str,
+    subj: Path,
+    ses: str,
 ):
     fs_transform = (
         func_derivatives
         / subj.name
+        / ses
         / "anat"
-        / f"{subj.name}_from-MNI152NLin2009cAsym_to-T1w_mode-image_xfm.h5"
+        / f"{subj.name}_{ses}_from-MNI152NLin2009cAsym_to-T1w_mode-image_xfm.h5"
     )
-    print(fs_transform.exists())
-    ref = fs_transform.with_name(f"{subj.name}_desc-preproc_T1w.nii.gz")
+    ref = fs_transform.with_name(f"{subj.name}_{ses}_desc-preproc_T1w.nii.gz")
+    print(ref.exists())
     out_file = (
         subj
         / "registrations"
         / "preprocessed_FS"
         / f"{atlas_name}_native.nii.gz"
     )
-    out_file.parent.mkdir(exist_ok=True)
+    out_file.parent.mkdir(exist_ok=True, parents=True)
     if out_file.exists():
         return
     # try:
@@ -137,7 +142,7 @@ def coreg_to_freesurfer(func_derivatives: Path, subj: Path):
 
 
 if __name__ == "__main__":
-    mother_dir = Path("/media/groot/Yalla/media")
+    mother_dir = Path("/media/groot/Yalla/media/MRI")
     bids_dir = mother_dir / "NIfTI"
     dwi_derivatives = mother_dir / "derivatives" / "dwiprep"
     func_derivatives = mother_dir / "derivatives" / "fmriprep"
@@ -147,11 +152,16 @@ if __name__ == "__main__":
     atlas_name = "Brainnetome"
 
     for subj in dwi_derivatives.glob("sub-*"):
-        try:
-            atlas_to_subject_space(
-                func_derivatives, atlas_file, atlas_name, subj
-            )
-            coreg_to_freesurfer(func_derivatives, subj)
-        except Exception:
-            print(f"Problem with subject {subj.name}")
-            continue
+        sessions = [
+            s.name for s in func_derivatives.glob(f"{subj.name}/ses-*")
+        ]
+        for ses in sessions:
+            print(subj, "---", ses)
+            try:
+                atlas_to_subject_space(
+                    func_derivatives, atlas_file, atlas_name, subj, ses
+                )
+                coreg_to_freesurfer(func_derivatives, subj)
+            except Exception:
+                print(f"Problem with subject {subj.name}")
+                continue
