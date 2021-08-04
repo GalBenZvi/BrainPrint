@@ -34,6 +34,7 @@ for subj in sorted(input_dir.glob("sub-*")):
             print(input_dict)
             t = PreprocessPipeline(input_dict, subj_output)
             t.run_corrections()
+            t.run_registrations(atlas=atlas)
         except:
             continue
     except:
