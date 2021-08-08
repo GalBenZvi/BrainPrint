@@ -35,5 +35,4 @@ if __name__ == "__main__":
                 func_derivatives, atlas_file, atlas_name, subj, session
             )
             single_session.coreg_to_freesurfer(func_derivatives, subj, session)
-        break
     clean_workspace()
