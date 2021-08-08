@@ -1,3 +1,6 @@
+"""
+Definition of the :class:`ReconAllResults` class.
+"""
 from pathlib import Path
 from typing import List, Union
 
@@ -6,14 +9,38 @@ from preprocessing.smri.recon_all.stats import ReconAllStats
 
 
 class ReconAllResults:
-    STATS_DIR = "stats"
+    """
+    Facilitates access to a recon-all results directory.
+    """
+    STATS_DIR: str = "stats"
 
     def __init__(self, path: Path):
+        """
+        Initializes a new :class:`ReconAllResults` instance.
+
+        Parameters
+        ----------
+        path : Path
+            Results directory path
+        """
         self.path = Path(path)
         self.stats = ReconAllStats(path / self.STATS_DIR)
 
     @classmethod
     def extract_stats(cls, path: Union[Path, List[Path]]) -> pd.DataFrame:
+        """
+        Extracts anatomical statistics from one or many result directories.
+
+        Parameters
+        ----------
+        path : Union[Path, List[Path]]
+            Results directory path or a list of such
+
+        Returns
+        -------
+        pd.DataFrame
+            Anatomical statistics
+        """
         if isinstance(path, Path):
             return ReconAllStats(path).to_dataframe()
         else:
