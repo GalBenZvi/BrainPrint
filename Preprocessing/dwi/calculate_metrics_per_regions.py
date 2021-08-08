@@ -250,17 +250,17 @@ if __name__ == "__main__":
     parcellations_dict = generate_parcellations_dict(
         parcellations_dir, parcellations
     )
-    for atlas_name, atlas_data in parcellations_dict.items():
-        print("###", atlas_name, "###")
-        atlas_parcels = atlas_data.get("atlas_parcels")
-
-        # try:
-        statistics_dir = derivatives_dir / "statistics" / f"{atlas_name}_FS"
-        statistics_dir.mkdir(exist_ok=True, parents=True)
-        subjects, parameters = parcellate_subjects_data(
-            derivatives_dir, atlas_parcels, "FS", "coreg_FS"
-        )
-        # print(subjects)
-        statistics_dict = generate_statistics(
-            subjects, statistics_dir, parameters, atlas_parcels
-        )
+    atlas_name = "Brainnetome"
+    atlas_data = parcellations_dict.get(atlas_name)
+    print("###", atlas_name, "###")
+    atlas_parcels = atlas_data.get("atlas_parcels")
+    # try:
+    statistics_dir = derivatives_dir / "statistics" / f"{atlas_name}_FS"
+    statistics_dir.mkdir(exist_ok=True, parents=True)
+    subjects, parameters = parcellate_subjects_data(
+        derivatives_dir, atlas_parcels, "FS", "coreg_FS"
+    )
+    # # print(subjects)
+    # statistics_dict = generate_statistics(
+    #     subjects, statistics_dir, parameters, atlas_parcels
+    # )

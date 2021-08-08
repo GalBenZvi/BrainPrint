@@ -42,13 +42,17 @@ def get_subject_files(derivatives_dir: Path, subj_id: str) -> dict:
         subj_dict["anat"] = anat_dir / f"{subj_id}_desc-preproc_T1w.nii.gz"
         subj_dict["output_dir"] = anat_dir
     else:
-        anat_dir = derivatives_dir / "fmriprep" / subj_id / "ses-1" / "anat"
+        session = [
+            ses.name
+            for ses in derivatives_dir.glob(f"fmriprep/{subj_id}/ses-*")
+        ][0]
+        anat_dir = derivatives_dir / "fmriprep" / subj_id / session / "anat"
         subj_dict["FS_transform"] = (
             anat_dir
-            / f"{subj_id}_ses-1_from-fsnative_to-T1w_mode-image_xfm.txt"
+            / f"{subj_id}_{session}_from-fsnative_to-T1w_mode-image_xfm.txt"
         )
         subj_dict["anat"] = (
-            anat_dir / f"{subj_id}_ses-1_desc-preproc_T1w.nii.gz"
+            anat_dir / f"{subj_id}_{session}_desc-preproc_T1w.nii.gz"
         )
         subj_dict["output_dir"] = anat_dir
     to_process = True
