@@ -84,72 +84,29 @@ def coreg_to_freesurfer(func_derivatives: Path, subj: Path, ses: str):
         / "anat"
         / f"{subj_id}_{ses}_desc-brain_mask.nii.gz"
     )
-    try:
-        fs_brain = fs_mask.with_name(fs_mask.name.replace("_mask", ""))
-        if not fs_brain.exists():
-            ### Extract brain ###
-            extract_brain(fs_ref, fs_brain, fs_mask)
-        epi_b0 = (
-            subj
-            / "registrations"
-            / "mean_b0"
-            / "mean_coregistered_mean_b0.nii.gz"
-        )
-        longitudinal = True
-        if not epi_b0.exists():
-            longitudinal = False
-            epi_b0 = (
-                subj / "registrations" / "mean_b0" / "mean_b0_ses-1.nii.gz"
-            )
-        out_file = (
-            subj
-            / "registrations"
-            / "preprocessed_FS"
-            / f"mean_epi2anatomical.nii.gz"
-        )
+    fs_brain = fs_mask.with_name(fs_mask.name.replace("_mask", ""))
+    if not fs_brain.exists():
+        ### Extract brain ###
+        extract_brain(fs_ref, fs_brain, fs_mask)
+    epi_b0 = subj / "registrations" / "mean_b0" / "mean_b0_ses-1.nii.gz"
+    out_file = (
+        subj
+        / "registrations"
+        / "preprocessed_FS"
+        / f"mean_epi2anatomical.nii.gz"
+    )
+    if not out_file.exists():
+        epi_reg(epi_b0, fs_ref, fs_brain, out_file)
+    aff_2 = out_file.parent / f"{out_file.name.split('.')[0]}.mat"
+    aff_full = aff_2
+    for param in subj.glob(f"ses-1/tensors*/native/*.mif"):
+        print(param)
+        param_nii = param.with_suffix(".nii.gz")
+        if not param_nii.exists():
+            os.system(f"mrconvert {param} {param_nii} -force")
+        out_file = param_nii.parent.parent / "coreg_FS" / param_nii.name
+        out_file.parent.mkdir(exist_ok=True)
+        print("\t\t", param.name)
         if not out_file.exists():
-            epi_reg(epi_b0, fs_ref, fs_brain, out_file)
-        aff_2 = out_file.parent / f"{out_file.name.split('.')[0]}.mat"
-        if longitudinal:
-            for ses, aff_name in zip(
-                ["ses-1", "ses-2"], ["pre2post", "post2pre"]
-            ):
-                print("\t", ses)
-                aff_1 = (
-                    subj
-                    / "registrations"
-                    / "mean_b0"
-                    / f"mean_b0_{aff_name}_half.mat"
-                )
-                aff_full = (
-                    subj
-                    / "registrations"
-                    / "preprocessed_FS"
-                    / f"{ses}_epi2anatomical.mat"
-                )
-                if not aff_full.exists():
-                    os.system(
-                        f"convert_xfm -omat {aff_full} -concat {aff_2} {aff_1}"
-                    )
-                inv_aff_full = aff_full.with_name(f"{ses}_anatomical2epi.mat")
-                if not inv_aff_full.exists():
-                    os.system(
-                        f"convert_xfm -omat {inv_aff_full} -inverse {aff_full}"
-                    )
-            else:
-                aff_full = out_file
-            for param in subj.glob(f"{ses}/tensors*/native/*.mif"):
-                param_nii = param.with_suffix(".nii.gz")
-                if not param_nii.exists():
-                    os.system(f"mrconvert {param} {param_nii} -force")
-                out_file = (
-                    param_nii.parent.parent / "coreg_FS" / param_nii.name
-                )
-                out_file.parent.mkdir(exist_ok=True)
-                print("\t\t", param.name)
-                if not out_file.exists():
-                    applyxfm_fsl(param_nii, aff_full, fs_brain, out_file)
-                    param_nii.unlink()
-
-    except:
-        return
+            applyxfm_fsl(param_nii, aff_full, fs_brain, out_file)
+            param_nii.unlink()

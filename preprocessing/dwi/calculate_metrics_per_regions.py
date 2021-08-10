@@ -4,6 +4,10 @@ import numpy as np
 import pandas as pd
 from scipy.stats import ttest_rel
 import tqdm
+from utils.parcellation import (
+    parcellation_labels,
+    parcellation_fname,
+)
 
 
 def get_available_parcellations(mother_dir: Path):
@@ -67,8 +71,6 @@ def read_parcels(atlas_parcels: Path) -> pd.DataFrame:
 
 def read_bna(atlas_parcels: Path) -> pd.DataFrame:
     df = pd.read_csv(atlas_parcels, sep=" ", header=None, index_col=0)
-    # print(df)
-    # df.index = df.Label.astype(int)
     df = pd.DataFrame(
         df.iloc[:, 0].values, columns=["ROIname"], index=df.index.values
     )
@@ -122,7 +124,7 @@ def parcellate_subjects_data(
     coreg_dirname: str = "coregistered",
 ):
     subjects_dict = {}
-    for subj in derivatives_dir.glob("sub-*"):
+    for subj in sorted(derivatives_dir.glob("sub-*")):
         print(subj.name)
         try:
             subj_data = {}
@@ -164,7 +166,6 @@ def generate_statistics(
     out_dict = {}
     for param in tqdm.tqdm(parameters):
         out_dict[param] = {}
-        # print(param)
         param_dir = out_dir / param
         param_dir.mkdir(exist_ok=True)
         param_df = pd.DataFrame(
@@ -246,19 +247,13 @@ if __name__ == "__main__":
     mother_dir = Path("/media/groot/Yalla/media/MRI/")
     derivatives_dir = mother_dir / "derivatives" / "dwiprep"
     parcellations_dir = Path("/media/groot/Data/Parcellations/MNI")
-    parcellations = get_available_parcellations(derivatives_dir)
-    parcellations_dict = generate_parcellations_dict(
-        parcellations_dir, parcellations
-    )
     atlas_name = "Brainnetome"
-    atlas_data = parcellations_dict.get(atlas_name)
     print("###", atlas_name, "###")
-    atlas_parcels = atlas_data.get("atlas_parcels")
     # try:
     statistics_dir = derivatives_dir / "statistics" / f"{atlas_name}_FS"
     statistics_dir.mkdir(exist_ok=True, parents=True)
     subjects, parameters = parcellate_subjects_data(
-        derivatives_dir, atlas_parcels, "FS", "coreg_FS"
+        derivatives_dir, parcellation_labels, "FS", "coreg_FS"
     )
     # # print(subjects)
     # statistics_dict = generate_statistics(

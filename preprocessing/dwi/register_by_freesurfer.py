@@ -19,18 +19,19 @@ if __name__ == "__main__":
     atlas_name = "Brainnetome"
 
     for subj in dwi_derivatives.glob("sub-*"):
+        print(subj)
         sessions = [
             s.name for s in func_derivatives.glob(f"{subj.name}/ses-*")
         ]
         if len(sessions) > 1:
-
+            print("Longitudinal registerations")
             longitudinal.atlas_to_subject_space(
                 func_derivatives, atlas_file, atlas_name, subj
             )
             longitudinal.coreg_to_freesurfer(func_derivatives, subj)
         elif len(sessions) == 1:
             session = sessions[0]
-            print(subj, "---", session)
+            print("Single-session registerations")
             single_session.atlas_to_subject_space(
                 func_derivatives, atlas_file, atlas_name, subj, session
             )
