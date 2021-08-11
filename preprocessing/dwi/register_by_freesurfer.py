@@ -18,7 +18,7 @@ if __name__ == "__main__":
     )
     atlas_name = "Brainnetome"
 
-    for subj in dwi_derivatives.glob("sub-*"):
+    for subj in sorted(dwi_derivatives.glob("sub-*")):
         print(subj)
         sessions = [
             s.name for s in func_derivatives.glob(f"{subj.name}/ses-*")

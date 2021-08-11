@@ -85,9 +85,9 @@ def read_aal_parcels(atlas_txt: Path) -> pd.DataFrame:
 
 
 def gather_subject_data(
-    derivatives_dir: Path, subj: str, atlas_name: str, norm_method: str = "CAT"
+    derivatives_dir: Path, subj: str, atlas_name: str
 ) -> dict:
-    fmriprep_dir = derivatives_dir.parent / "fmriprep" / subj
+    fmriprep_dir = derivatives_dir / subj
     sessions = [f.name for f in fmriprep_dir.glob("ses-*")]
     if len(sessions) > 1:
         native_parcels = fmriprep_dir / "anat" / f"{atlas_name}_native.nii.gz"
@@ -145,16 +145,17 @@ def average_parcels(
 def parcellate_subjects_data(
     derivatives_dir: Path,
     atlas_parcels: pd.DataFrame,
-    norm_method: str = "CAT",
-    coreg_dirname: str = "coregistered",
+    atlas_name: str = "Brainnetome",
+    features: list = ["Thickness", "Volume", "Sulc"],
 ):
     subjects_dict = {}
     for subj in sorted(derivatives_dir.glob("sub-*")):
+        if not subj.is_dir():
+            continue
         print(subj.name)
         try:
-            subj_data = {}
             native_parcels_full, gm_mask = gather_subject_data(
-                derivatives_dir, subj.name, atlas_name, norm_method
+                derivatives_dir, subj.name, atlas_name
             )
             native_parcels = crop_to_gm(native_parcels_full, gm_mask)
             atlas_data = nib.load(native_parcels).get_fdata()
@@ -163,127 +164,35 @@ def parcellate_subjects_data(
                 f"No {atlas_name} native parcellation found for {subj.name}!"
             )
             continue
-        for session in subj.glob("ses-*"):
-            print(session.name)
-            session_df = atlas_parcels.copy()
-            tensor_dir = session / "tensors_parameters" / coreg_dirname
-            tensor_dir.mkdir(exist_ok=True)
-            out_fname = tensor_dir / f"{atlas_name}_parcels.csv"
-            subj_data[session.name] = out_fname
-            # if not out_fname.exists():
-            params = [p for p in tensor_dir.glob("*.nii.gz")]
-            if not params:
-                continue
-            for param in tqdm.tqdm(params):
-                # print(param.name.split(".")[0])
-                session_df[param.name.split(".")[0]] = average_parcels(
-                    atlas_data, param, session_df
-                )
-            session_df.to_csv(out_fname)
-        subjects_dict[subj.name] = subj_data
-    return (
-        subjects_dict,
-        [f.name.split(".")[0] for f in tensor_dir.glob("*.nii.gz")],
-    )
-
-
-def generate_statistics(
-    subjects: dict,
-    out_dir: Path,
-    parameters: list,
-    atlas_parcels: pd.DataFrame,
-):
-    out_dict = {}
-    for param in tqdm.tqdm(parameters):
-        out_dict[param] = {}
-        param_dir = out_dir / param
-        param_dir.mkdir(exist_ok=True)
-        param_df = pd.DataFrame(
-            index=subjects.keys(), columns=atlas_parcels.ROIname.values
-        )
-        for session in ["ses-1", "ses-2"]:
-            out_fname = param_dir / f"{session}.csv"
-            # print(out_fname)
-            out_dict[param][session] = out_fname
-            # if out_fname.exists():
-            #     continue
-            session_df = param_df.copy()
-            for subj, subj_data in subjects.items():
-                # print(subj)
-                session_df.loc[subj] = pd.read_csv(
-                    subj_data.get(session), index_col=0
-                )[param].values
-            session_df.to_csv(out_fname)
-    return out_dict
-
-
-def calculate_statistics(out_dir: Path, inputs: dict):
-    for param, sessions in inputs.items():
-        # print(Path(out_dir / param).exists())
-        out_fname = out_dir / param / "statistics.csv"
-        # if out_fname.exists():
+        sessions = [ses.name for ses in subj.glob("ses-*")]
+        if len(sessions) > 1:
+            anat_dir = subj / "anat"
+        else:
+            anat_dir = subj / sessions[0] / "anat"
+        temp_df = atlas_parcels.copy()
+        out_file = anat_dir / f"{atlas_name}_parcels.csv"
+        # if out_file.exists():
         #     continue
-        before, after = [
-            pd.read_csv(session, index_col=0) for session in sessions.values()
-        ]
-        t, p = ttest_rel(before, after, axis=0, nan_policy="omit")
-        df = pd.DataFrame(columns=["t", "p"], index=before.columns)
-        df["t"] = t
-        df["p"] = p
-        df.to_csv(out_fname)
-        inputs[param]["statistics"] = out_fname
-    return inputs
-
-
-def df_to_nii(
-    df: pd.DataFrame,
-    template_data: nib.Nifti1Image,
-    affine,
-    atlas_parcels: pd.DataFrame,
-    out_dir: Path,
-):
-    p_data = np.zeros_like(template_data)
-    p_vis_data = np.zeros_like(template_data)
-    t_data = np.zeros_like(template_data)
-    for i in df.index:
-        # print(i)
-        val = atlas_parcels.index[atlas_parcels.ROIname == i][0].astype(float)
-        print(i, "---", val)
-        mask = template_data == val
-        for data, col in zip([p_data, t_data, p_vis_data], ["p", "t", "1-p"]):
-            data[mask] = df[col][i]
-    for data, fname in zip(
-        [p_data, t_data, p_vis_data], ["p_values", "t_scores", "1-p_values"]
-    ):
-        img = nib.Nifti1Image(data, affine)
-        nib.save(img, out_dir / f"{fname}.nii.gz")
-
-
-def statistics_to_img(
-    out_dir: Path, inputs: dict, template: nib.Nifti1Image, atlas_parcels
-):
-    temp_data = template.get_fdata()
-    affine = template.affine
-    for param in inputs.keys():
-        param_dir = out_dir / param
-        statistics = pd.read_csv(
-            inputs.get(param).get("statistics"), index_col=0
-        )
-        statistics["1-p"] = 1 - statistics["p"]
-        df_to_nii(statistics, temp_data, affine, atlas_parcels, param_dir)
+        for param in tqdm.tqdm(features):
+            param_file = anat_dir / f"{subj.name}_{param.lower()}.nii.gz"
+            if not param_file.exists():
+                continue
+            temp_df[param] = average_parcels(atlas_data, param_file, temp_df)
+        temp_df.to_csv(out_file)
 
 
 if __name__ == "__main__":
     mother_dir = Path("/media/groot/Yalla/media/MRI/")
-    derivatives_dir = mother_dir / "derivatives" / "dwiprep"
+    derivatives_dir = mother_dir / "derivatives" / "fmriprep"
     parcellations_dir = Path("/media/groot/Data/Parcellations/MNI")
     atlas_name = "Brainnetome"
     print("###", atlas_name, "###")
     # try:
-    statistics_dir = derivatives_dir / "statistics" / f"{atlas_name}_FS"
-    statistics_dir.mkdir(exist_ok=True, parents=True)
+    # statistics_dir = derivatives_dir / "statistics" / f"{atlas_name}_FS"
+    # statistics_dir.mkdir(exist_ok=True, parents=True)
     subjects, parameters = parcellate_subjects_data(
-        derivatives_dir, parcellation_labels, "FS", "coreg_FS"
+        derivatives_dir,
+        parcellation_labels,
     )
     # # print(subjects)
     # statistics_dict = generate_statistics(

@@ -53,13 +53,8 @@ def atlas_to_subject_space(
         / f"{subj.name}_from-MNI152NLin2009cAsym_to-T1w_mode-image_xfm.h5"
     )
     ref = fs_transform.with_name(f"{subj.name}_desc-preproc_T1w.nii.gz")
-    out_file = (
-        subj
-        / "registrations"
-        / "preprocessed_FS"
-        / f"{atlas_name}_native.nii.gz"
-    )
-    out_file.parent.mkdir(exist_ok=True, parents=True)
+    out_file = fs_transform.with_name(f"{atlas_name}_native.nii.gz")
+    # out_file.parent.mkdir(exist_ok=True, parents=True)
     if out_file.exists():
         return
     # try:
