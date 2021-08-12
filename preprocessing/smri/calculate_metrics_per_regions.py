@@ -171,8 +171,9 @@ def parcellate_subjects_data(
             anat_dir = subj / sessions[0] / "anat"
         temp_df = atlas_parcels.copy()
         out_file = anat_dir / f"{atlas_name}_parcels.csv"
-        # if out_file.exists():
-        #     continue
+        print(out_file)
+        if out_file.exists():
+            continue
         for param in tqdm.tqdm(features):
             param_file = anat_dir / f"{subj.name}_{param.lower()}.nii.gz"
             if not param_file.exists():

@@ -23,17 +23,22 @@ if __name__ == "__main__":
         sessions = [
             s.name for s in func_derivatives.glob(f"{subj.name}/ses-*")
         ]
-        if len(sessions) > 1:
-            print("Longitudinal registerations")
-            longitudinal.atlas_to_subject_space(
-                func_derivatives, atlas_file, atlas_name, subj
-            )
-            longitudinal.coreg_to_freesurfer(func_derivatives, subj)
-        elif len(sessions) == 1:
-            session = sessions[0]
-            print("Single-session registerations")
-            single_session.atlas_to_subject_space(
-                func_derivatives, atlas_file, atlas_name, subj, session
-            )
-            single_session.coreg_to_freesurfer(func_derivatives, subj, session)
+        try:
+            if len(sessions) > 1:
+                print("Longitudinal registerations")
+                longitudinal.atlas_to_subject_space(
+                    func_derivatives, atlas_file, atlas_name, subj
+                )
+                longitudinal.coreg_to_freesurfer(func_derivatives, subj)
+            elif len(sessions) == 1:
+                session = sessions[0]
+                print("Single-session registerations")
+                single_session.atlas_to_subject_space(
+                    func_derivatives, atlas_file, atlas_name, subj, session
+                )
+                single_session.coreg_to_freesurfer(
+                    func_derivatives, subj, session
+                )
+        except:
+            continue
     clean_workspace()
