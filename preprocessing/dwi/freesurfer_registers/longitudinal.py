@@ -86,6 +86,8 @@ def coreg_to_freesurfer(func_derivatives: Path, subj: Path):
             / "mean_b0"
             / "mean_coregistered_mean_b0.nii.gz"
         )
+        if not epi_b0.exists():
+            epi_b0 = epi_b0.with_name("mean_b0_ses-1.nii.gz")
         out_file = (
             subj
             / "registrations"

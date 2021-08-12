@@ -88,6 +88,8 @@ def gather_subject_data(
     derivatives_dir: Path, subj: str, atlas_name: str, norm_method: str = "CAT"
 ) -> dict:
     fmriprep_dir = derivatives_dir.parent / "fmriprep" / subj
+    if not fmriprep_dir.exists():
+        return None, None
     sessions = [f.name for f in fmriprep_dir.glob("ses-*")]
     if len(sessions) > 1:
         native_parcels = fmriprep_dir / "anat" / f"{atlas_name}_native.nii.gz"
@@ -156,6 +158,8 @@ def parcellate_subjects_data(
             native_parcels_full, gm_mask = gather_subject_data(
                 derivatives_dir, subj.name, atlas_name, norm_method
             )
+            if not native_parcels_full:
+                continue
             native_parcels = crop_to_gm(native_parcels_full, gm_mask)
             atlas_data = nib.load(native_parcels).get_fdata()
         except FileNotFoundError:
@@ -172,7 +176,7 @@ def parcellate_subjects_data(
             subj_data[session.name] = out_fname
             # if not out_fname.exists():
             params = [p for p in tensor_dir.glob("*.nii.gz")]
-            if not params:
+            if not params or out_fname.exists():
                 continue
             for param in tqdm.tqdm(params):
                 # print(param.name.split(".")[0])
