@@ -40,7 +40,7 @@ class SubjectResults:
         if not sessions:
             return
         longitudinal = len(sessions) > 1
-        buffer_dir = sessions[0] if longitudinal else ""
+        buffer_dir = "" if longitudinal else sessions[0]
         return functional / buffer_dir / self.STRUCTURAL_DERIVATIVE_DIR
 
     def get_dwi_paths(self) -> dict:
