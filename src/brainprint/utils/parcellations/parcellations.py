@@ -1,7 +1,7 @@
 from enum import Enum
 from pathlib import Path
 
-current_dir = Path(__file__)
+current_dir = Path(__file__).parent
 brainnetome_atlas = (
     current_dir / "Brainnetome" / "BN_Atlas_274_combined_1mm.nii.gz"
 )

@@ -2,7 +2,10 @@ import warnings
 from collections import defaultdict
 from pathlib import Path
 from typing import Callable, Dict, List
+from brainprint.feature_generation.utils.parcellation import parcellate_metric
 
+import tqdm
+import pandas as pd
 import nibabel as nib
 import numpy as np
 from brainprint.feature_generation.utils.features import FEATURES
@@ -137,7 +140,12 @@ class SubjectResults:
                 subject_dict[modality] = getter()
         return subject_dict
 
-    def parcellate_metric(self, path: Path, atlas_name: str = None):
+    def parcellate_metric(
+        self,
+        path: Path,
+        atlas_data: np.ndarray,
+        atlas_template_df: pd.DataFrame,
+    ):
         """
         Returns the summarized metric information.
 
@@ -149,17 +157,47 @@ class SubjectResults:
             Atlas name
         atlas_df : pd.DataFrame
             Path to subject's template parcellation pd.DataFrame
+
+        Parameters
+        ----------
+        path : Path
+            Path to metric's image
+        atlas_data : np.ndarray
+            A np.ndarray comprised of parcellation atlas' labels
+        atlas_template_df : pd.DataFrame
+            A pd.DataFrame to be filled with labels' summarized values.
+
+        Returns
+        -------
+        np.ndarray comprised of summarized values of the image given as input.
         """
         metric_img = nib.load(path)
-        atlas_path = parcellations[atlas_name]["atlas"]
-        atlas_data = nib.load(atlas_path).get_fdata()
         metric_data = metric_img.get_fdata()
-        temp = np.zeros(atlas_df.shape[0])
-        for i, parcel in tqdm.tqdm(enumerate(atlas_df.index)):
-            label = atlas_df.loc[parcel, "Label"]
+        temp = np.zeros(atlas_template_df.shape[0])
+        for i, parcel in enumerate(atlas_template_df.index):
+            label = atlas_template_df.loc[parcel, "Label"]
             mask = atlas_data == label
             temp[i] = np.nanmean(metric_data[mask.astype(bool)])
         return temp
+
+    def summarize_subject_metrics(self, atlas_name: str = None):
+        atlas_name = atlas_name or self.DEFAULT_ATLAS_NAME
+        atlas_img = nib.load(self.get_subject_parcellation())
+        atlas_data = atlas_img.get_fdata()
+        subject_metrics = {}
+        for key in self.derivative_dict.keys():
+            for ses in self.derivative_dict.get(key).keys():
+                template_df = pd.read_csv(
+                    parcellations.get("Brainnetome").get("labels"), index_col=0
+                ).copy()
+                for metric, path in (
+                    self.derivative_dict.get(key).get(ses).items()
+                ):
+                    template_df[metric] = self.parcellate_metric(
+                        path, atlas_data, template_df
+                    )
+                subject_metrics[ses] = template_df
+        return subject_metrics
 
     @property
     def diffusion_derivatives_path(self) -> Path:
@@ -184,3 +222,4 @@ if __name__ == "__main__":
     base_dir = Path("/media/groot/Yalla/media/MRI")
     subj_id = "sub-233"
     res = SubjectResults(base_dir, subj_id)
+    print(res.summarize_subject_metrics())
