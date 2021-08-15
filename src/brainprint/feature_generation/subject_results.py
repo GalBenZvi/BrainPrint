@@ -142,3 +142,10 @@ class SubjectResults:
         if self._results_dict is None:
             self._results_dict = self.get_derivative_dict()
         return self._results_dict
+
+
+if __name__ == "__main__":
+    base_dir = Path("/media/groot/Yalla/media/MRI")
+    subj_id = "sub-233"
+    res = SubjectResults(base_dir, subj_id)
+    
