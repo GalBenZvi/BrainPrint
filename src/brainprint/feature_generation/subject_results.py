@@ -13,7 +13,7 @@ class SubjectResults:
     FUNCTIONAL_RELATIVE_PATH: str = "derivatives/fmriprep"
     STRUCTURAL_DERIVATIVE_DIR: str = "anat"
     SESSION_DIRECTORY_PATTERN: str = "ses-*"
-    FIRST_SESSION: str = SESSION_DIRECTORY_PATTERN.replace("*", "1")
+    FIRST_SESSION: str = "ses-1"
     SUBJECT_DIRECTORY_PATTERN: str = "sub-*"
     TENSOR_DIRECTORY_PATH: str = "tensors_parameters/coreg_FS"
     DERIVATIVES_FROM_MODALITY: Dict[Modality, Callable] = {
@@ -138,49 +138,3 @@ class SubjectResults:
     @property
     def derivative_dict(self) -> dict:
         return self.get_derivative_dict()
-
-    # def check_subject_derivatives(base_dir: Path, subject_id: str) -> bool:
-    #     """
-    #     Checks whether a given subject has the required derivatives within
-    #     *base_dir*.
-
-    #     Parameters
-    #     ----------
-    #     base_dir : Path
-    #         Base project directory
-    #     subject_id : str
-    #         Subject ID (and expected directory name)
-
-    #     Returns
-    #     -------
-    #     bool
-    #         Whether this subject has the required derivates or not
-    #     """
-    #     return all(
-    #         getter(base_dir, subject_id).exists()
-    #         for getter in DERIVATIVE_PATH_GETTER.values()
-    #     )
-
-    # def generate_preprocessed_subjects(base_dir: Path) -> list:
-    #     """
-    #     Iterate over the main directory to find subjects that have all necessary
-    #     files.
-
-    #     Parameters
-    #     ----------
-    #     base_dir : Path
-    #         Path to project's main directory
-
-    #     Returns
-    #     -------
-    #     list
-    #         List of subjects' identifiers comprised only of "valid" subjects
-    #     """
-    #     bids_dir = Path(base_dir) / BIDS_DIR_NAME
-    #     subject_dirs = bids_dir.glob(SUBJECT_DIRECTORY_PATTERN)
-    #     for subject_dir in subject_dirs:
-    #         has_derivates = check_subject_derivatives(
-    #             base_dir, subject_dir.name
-    #         )
-    #         if has_derivates:
-    #             yield subject_dir.name
