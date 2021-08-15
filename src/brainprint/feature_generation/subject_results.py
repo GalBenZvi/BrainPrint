@@ -3,8 +3,10 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Callable, Dict, List
 
+import nibabel as nib
+import numpy as np
 from brainprint.feature_generation.utils.features import FEATURES
-from brainprint.utils import Modality
+from brainprint.utils import Modality, parcellations
 
 
 class SubjectResults:
@@ -135,6 +137,30 @@ class SubjectResults:
                 subject_dict[modality] = getter()
         return subject_dict
 
+    def parcellate_metric(self, path: Path, atlas_name: str = None):
+        """
+        Returns the summarized metric information.
+
+        Parameters
+        ----------
+        path : Path
+            Path to metric's image
+        atlas_name : Path
+            Atlas name
+        atlas_df : pd.DataFrame
+            Path to subject's template parcellation pd.DataFrame
+        """
+        metric_img = nib.load(path)
+        atlas_path = parcellations[atlas_name]["atlas"]
+        atlas_data = nib.load(atlas_path).get_fdata()
+        metric_data = metric_img.get_fdata()
+        temp = np.zeros(atlas_df.shape[0])
+        for i, parcel in tqdm.tqdm(enumerate(atlas_df.index)):
+            label = atlas_df.loc[parcel, "Label"]
+            mask = atlas_data == label
+            temp[i] = np.nanmean(metric_data[mask.astype(bool)])
+        return temp
+
     @property
     def diffusion_derivatives_path(self) -> Path:
         return self.get_diffusion_derivatives_path()
@@ -158,4 +184,3 @@ if __name__ == "__main__":
     base_dir = Path("/media/groot/Yalla/media/MRI")
     subj_id = "sub-233"
     res = SubjectResults(base_dir, subj_id)
-    
