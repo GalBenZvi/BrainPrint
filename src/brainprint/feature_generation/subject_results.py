@@ -1,3 +1,4 @@
+import warnings
 from collections import defaultdict
 from pathlib import Path
 from typing import Callable, Dict, List
@@ -27,6 +28,7 @@ class SubjectResults:
     def __init__(self, base_dir: Path, subject_id: str) -> None:
         self.base_dir = base_dir
         self.subject_id = subject_id
+        self.native_parcellation = self.get_subject_parcellation()
 
     def get_diffusion_derivatives_path(self) -> Path:
         return self.base_dir / self.DIFFUSION_RELATIVE_PATH / self.subject_id
@@ -42,6 +44,17 @@ class SubjectResults:
         longitudinal = len(sessions) > 1
         buffer_dir = "" if longitudinal else sessions[0]
         return functional / buffer_dir / self.STRUCTURAL_DERIVATIVE_DIR
+
+    def get_subject_parcellation(self, atlas_name: str = None) -> Path:
+        atlas_name = atlas_name or self.DEFAULT_ATLAS_NAME
+        atlas_file = f"{atlas_name}_native_GM.nii.gz"
+        path = self.structural_derivatives_path / atlas_file
+        if not path.exists():
+            warnings.warn(
+                f"Subject {self.subject_id} does not have a native GM parcellation."
+            )
+        else:
+            return self.structural_derivatives_path / atlas_file
 
     def get_dwi_paths(self) -> dict:
         """
@@ -87,15 +100,12 @@ class SubjectResults:
         dict
             Derivated file path by parameter ID
         """
-        derivatives_dir = self.structural_derivatives_path
         subject_derivatives = defaultdict(dict)
-        atlas_file = f"{atlas_name}_native_GM.nii.gz"
-        subject_derivatives["native_parcellation"] = (
-            derivatives_dir / atlas_file
-        )
         for parameter in self.PARAMETERS.get(Modality.STRUCTURAL):
             derivative_file = f"{self.subject_id}_{parameter.lower()}.nii.gz"
-            derivative_path = derivatives_dir / derivative_file
+            derivative_path = (
+                self.structural_derivatives_path / derivative_file
+            )
             if derivative_path.exists():
                 subject_derivatives[self.FIRST_SESSION][
                     parameter
@@ -122,7 +132,7 @@ class SubjectResults:
         for modality, getter_name in self.DERIVATIVES_FROM_MODALITY.items():
             getter = getattr(self, getter_name, None)
             if getter is not None:
-                subject_dict["Features"][modality] = getter()
+                subject_dict[modality] = getter()
         return subject_dict
 
     @property
