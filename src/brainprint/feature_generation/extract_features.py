@@ -12,42 +12,6 @@ from brainprint.utils import Modality
 
 from utils.parcellation import parcellate_metric, parcellation_labels
 
-DEFAULT_ATLAS_NAME: str = "Brainnetome"
-BIDS_DIR_NAME: str = "NIfTI"
-DIFFUSION_RELATIVE_PATH: str = "derivatives/dwiprep"
-FUNCTIONAL_RELATIVE_PATH: str = "derivatives/fmriprep"
-STRUCTURAL_DERIVATIVE_DIR: str = "anat"
-
-SESSION_DIRECTORY_PATTERN: str = "ses-*"
-FIRST_SESSION: str = SESSION_DIRECTORY_PATTERN.replace("*", "1")
-SUBJECT_DIRECTORY_PATTERN: str = "sub-*"
-TENSOR_DIRECTORY_PATH: str = "tensors_parameters/coreg_FS"
-
-
-def get_diffusion_derivates_path(base_dir: Path, subject_id: str) -> Path:
-    return base_dir / DIFFUSION_RELATIVE_PATH / subject_id
-
-
-def get_functional_derivates_path(base_dir: Path, subject_id: str) -> Path:
-    return base_dir / FUNCTIONAL_RELATIVE_PATH / subject_id
-
-
-def get_structural_derivates_path(base_dir: Path, subject_id: str) -> Path:
-    functional = get_functional_derivates_path(base_dir, subject_id)
-    sessions = list(functional.glob(SESSION_DIRECTORY_PATTERN))
-    if not sessions:
-        return
-    longitudinal = len(sessions) > 1
-    buffer_dir = sessions[0] if longitudinal else ""
-    return functional / buffer_dir / STRUCTURAL_DERIVATIVE_DIR
-
-
-DERIVATIVE_PATH_GETTER: Dict[Modality, str] = {
-    Modality.DIFFUSION: get_diffusion_derivates_path,
-    Modality.FUNCTIONAL: get_functional_derivates_path,
-    Modality.STRUCTURAL: get_structural_derivates_path,
-}
-
 
 def check_subject_derivatives(base_dir: Path, subject_id: str) -> bool:
     """
