@@ -1,0 +1,275 @@
+,ROIname,Label,Lobe,Gyrus,description,SubNetwork
+0,A8m_L,1,Frontal Lobe ,"SFG, Superior Frontal Gyrus  ", medial area 8,AN
+1,A8m_R,2,Frontal Lobe ,"SFG, Superior Frontal Gyrus  ", medial area 8,AN
+2,A8dl_L,3,Frontal Lobe ,"SFG, Superior Frontal Gyrus  ", dorsolateral area 8,AN
+3,A8dl_R,4,Frontal Lobe ,"SFG, Superior Frontal Gyrus  ", dorsolateral area 8,AN
+4,A9l_L,5,Frontal Lobe ,"SFG, Superior Frontal Gyrus  ", lateral area 9,AN
+5,A9l_R,6,Frontal Lobe ,"SFG, Superior Frontal Gyrus  ", lateral area 9,AN
+6,A6dl_L,7,Frontal Lobe ,"SFG, Superior Frontal Gyrus  ", dorsolateral area 6,AN
+7,A6dl_R,8,Frontal Lobe ,"SFG, Superior Frontal Gyrus  ", dorsolateral area 6,AN
+8,A6m_L,9,Frontal Lobe ,"SFG, Superior Frontal Gyrus  ", medial area 6,AN
+9,A6m_R,10,Frontal Lobe ,"SFG, Superior Frontal Gyrus  ", medial area 6,AN
+10,A9m_L,11,Frontal Lobe ,"SFG, Superior Frontal Gyrus  ",medial area 9,DMN
+11,A9m_R,12,Frontal Lobe ,"SFG, Superior Frontal Gyrus  ",medial area 9,AN
+12,A10m_L,13,Frontal Lobe ,"SFG, Superior Frontal Gyrus  ", medial area 10,AN
+13,A10m_R,14,Frontal Lobe ,"SFG, Superior Frontal Gyrus  ", medial area 10,AN
+14,A9/46d_L,15,Frontal Lobe ,"MFG, Middle Frontal Gyrus ", dorsal area 9/46,AN
+15,A9/46d_R,16,Frontal Lobe ,"MFG, Middle Frontal Gyrus ", dorsal area 9/46,AN
+16,IFJ_L,17,Frontal Lobe ,"MFG, Middle Frontal Gyrus ", inferior frontal junction,AN
+17,IFJ_R,18,Frontal Lobe ,"MFG, Middle Frontal Gyrus ", inferior frontal junction,AN
+18,A46_L,19,Frontal Lobe ,"MFG, Middle Frontal Gyrus ", area 46,FPN
+19,A46_R,20,Frontal Lobe ,"MFG, Middle Frontal Gyrus ", area 46,FPN
+20,A9/46v_L,21,Frontal Lobe ,"MFG, Middle Frontal Gyrus ", ventral area 9/46 ,FPN
+21,A9/46v_R,22,Frontal Lobe ,"MFG, Middle Frontal Gyrus ", ventral area 9/46 ,FPN
+22,A8vl_L,23,Frontal Lobe ,"MFG, Middle Frontal Gyrus ", ventrolateral area 8,DMN
+23,A8vl_R,24,Frontal Lobe ,"MFG, Middle Frontal Gyrus ", ventrolateral area 8,DMN
+24,A6vl_L,25,Frontal Lobe ,"MFG, Middle Frontal Gyrus ", ventrolateral area 6,AN
+25,A6vl_R,26,Frontal Lobe ,"MFG, Middle Frontal Gyrus ", ventrolateral area 6,AN
+26,A10l_L,27,Frontal Lobe ,"MFG, Middle Frontal Gyrus ", lateral area10,AN
+27,A10l_R,28,Frontal Lobe ,"MFG, Middle Frontal Gyrus ", lateral area10,AN
+28,A44d_L,29,Frontal Lobe ,"IFG, Inferior Frontal Gyrus",dorsal area 44,AN
+29,A44d_R,30,Frontal Lobe ,"IFG, Inferior Frontal Gyrus",dorsal area 44,AN
+30,IFS_L,31,Frontal Lobe ,"IFG, Inferior Frontal Gyrus", inferior frontal sulcus,SMN
+31,IFS_R,32,Frontal Lobe ,"IFG, Inferior Frontal Gyrus", inferior frontal sulcus,SMN
+32,A45c_L,33,Frontal Lobe ,"IFG, Inferior Frontal Gyrus", caudal area 45,AN
+33,A45c_R,34,Frontal Lobe ,"IFG, Inferior Frontal Gyrus", caudal area 45,AN
+34,A45r_L,35,Frontal Lobe ,"IFG, Inferior Frontal Gyrus", rostral area 45,DMN
+35,A45r_R,36,Frontal Lobe ,"IFG, Inferior Frontal Gyrus", rostral area 45,DMN
+36,A44op_L,37,Frontal Lobe ,"IFG, Inferior Frontal Gyrus", opercular area 44,AN
+37,A44op_R,38,Frontal Lobe ,"IFG, Inferior Frontal Gyrus", opercular area 44,AN
+38,A44v_L,39,Frontal Lobe ,"IFG, Inferior Frontal Gyrus", ventral area 44,AN
+39,A44v_R,40,Frontal Lobe ,"IFG, Inferior Frontal Gyrus", ventral area 44,AN
+40,A14m_L,41,Frontal Lobe ,"OrG, Orbital Gyrus", medial area 14,DMN
+41,A14m_R,42,Frontal Lobe ,"OrG, Orbital Gyrus", medial area 14,DMN
+42,A12/47o_L,43,Frontal Lobe ,"OrG, Orbital Gyrus", orbital area 12/47,DMN
+43,A12/47o_R,44,Frontal Lobe ,"OrG, Orbital Gyrus", orbital area 12/47,DMN
+44,A11l_L,45,Frontal Lobe ,"OrG, Orbital Gyrus", lateral area 11,AN
+45,A11l_R,46,Frontal Lobe ,"OrG, Orbital Gyrus", lateral area 11,AN
+46,A11m_L,47,Frontal Lobe ,"OrG, Orbital Gyrus", medial area 11,FPN
+47,A11m_R,48,Frontal Lobe ,"OrG, Orbital Gyrus", medial area 11,FPN
+48,A13_L,49,Frontal Lobe ,"OrG, Orbital Gyrus", area 13,AN
+49,A13_R,50,Frontal Lobe ,"OrG, Orbital Gyrus", area 13,AN
+50,A12/47l_L,51,Frontal Lobe ,"OrG, Orbital Gyrus", lateral area 12/47,DMN
+51,A12/47l_R,52,Frontal Lobe ,"OrG, Orbital Gyrus", lateral area 12/47,DMN
+52,A4hf_L,53,Frontal Lobe ,"PrG, Precentral Gyrus", area 4(head and face region),SMN
+53,A4hf_R,54,Frontal Lobe ,"PrG, Precentral Gyrus", area 4(head and face region),SMN
+54,A6cdl_L,55,Frontal Lobe ,"PrG, Precentral Gyrus", caudal dorsolateral area 6,AN
+55,A6cdl_R,56,Frontal Lobe ,"PrG, Precentral Gyrus", caudal dorsolateral area 6,AN
+56,A4ul_L,57,Frontal Lobe ,"PrG, Precentral Gyrus", area 4(upper limb region),SMN
+57,A4ul_R,58,Frontal Lobe ,"PrG, Precentral Gyrus", area 4(upper limb region),SMN
+58,A4t_L,59,Frontal Lobe ,"PrG, Precentral Gyrus", area 4(trunk region),SMN
+59,A4t_R,60,Frontal Lobe ,"PrG, Precentral Gyrus", area 4(trunk region),SMN
+60,A4tl_L,61,Frontal Lobe ,"PrG, Precentral Gyrus", area 4(tongue and larynx region),AN
+61,A4tl_R,62,Frontal Lobe ,"PrG, Precentral Gyrus", area 4(tongue and larynx region),AN
+62,A6cvl_L,63,Frontal Lobe ,"PrG, Precentral Gyrus", caudal ventrolateral area 6,AN
+63,A6cvl_R,64,Frontal Lobe ,"PrG, Precentral Gyrus", caudal ventrolateral area 6,AN
+64,A1/2/3ll_L,65,Frontal Lobe ,"PCL, Paracentral Lobule", area1/2/3 (lower limb region),SMN
+65,A1/2/3ll_R,66,Frontal Lobe ,"PCL, Paracentral Lobule", area1/2/3 (lower limb region),SMN
+66,A4ll_L,67,Frontal Lobe ,"PCL, Paracentral Lobule", area 4,AN
+67,A4ll_R,68,Frontal Lobe ,"PCL, Paracentral Lobule", area 4,AN
+68,A38m_L,69,Temporal Lobe,"STG, Superior Temporal Gyrus", medial area 38,AN
+69,A38m_R,70,Temporal Lobe,"STG, Superior Temporal Gyrus", medial area 38,AN
+70,A41/42_L,71,Temporal Lobe,"STG, Superior Temporal Gyrus", area 41/42,SMN
+71,A41/42_R,72,Temporal Lobe,"STG, Superior Temporal Gyrus", area 41/42,SMN
+72,TE1.0 and TE1.2_L,73,Temporal Lobe,"STG, Superior Temporal Gyrus",TE1.0 and TE1.2,AN
+73,TE1.0 and TE1.2_R,74,Temporal Lobe,"STG, Superior Temporal Gyrus",TE1.0 and TE1.2,AN
+74,A22c_L,75,Temporal Lobe,"STG, Superior Temporal Gyrus", caudal area 22,SMN
+75,A22c_R,76,Temporal Lobe,"STG, Superior Temporal Gyrus", caudal area 22,SMN
+76,A38l_L,77,Temporal Lobe,"STG, Superior Temporal Gyrus", lateral area 38,FPN
+77,A38l_R,78,Temporal Lobe,"STG, Superior Temporal Gyrus", lateral area 38,FPN
+78,A22r_L,79,Temporal Lobe,"STG, Superior Temporal Gyrus", rostral area 22,DMN
+79,A22r_R,80,Temporal Lobe,"STG, Superior Temporal Gyrus", rostral area 22,DMN
+80,A21c_L,81,Temporal Lobe,"MTG, Middle Temporal Gyrus", caudal area 21,DMN
+81,A21c_R,82,Temporal Lobe,"MTG, Middle Temporal Gyrus", caudal area 21,DMN
+82,A21r_L,83,Temporal Lobe,"MTG, Middle Temporal Gyrus", rostral area 21,AN
+83,A21r_R,84,Temporal Lobe,"MTG, Middle Temporal Gyrus", rostral area 21,AN
+84,A37dl_L,85,Temporal Lobe,"MTG, Middle Temporal Gyrus", dorsolateral area37,AN
+85,A37dl_R,86,Temporal Lobe,"MTG, Middle Temporal Gyrus", dorsolateral area37,AN
+86,aSTS_L,87,Temporal Lobe,"MTG, Middle Temporal Gyrus", anterior superior temporal sulcus,DMN
+87,aSTS_R,88,Temporal Lobe,"MTG, Middle Temporal Gyrus", anterior superior temporal sulcus,DMN
+88,A20iv_L,89,Temporal Lobe,"ITG, Inferior Temporal Gyrus", intermediate ventral area 20,Limbic
+89,A20iv_R,90,Temporal Lobe,"ITG, Inferior Temporal Gyrus", intermediate ventral area 20,Limbic
+90,A37elv_L,91,Temporal Lobe,"ITG, Inferior Temporal Gyrus", extreme lateroventral area37,AN
+91,A37elv_R,92,Temporal Lobe,"ITG, Inferior Temporal Gyrus", extreme lateroventral area37,AN
+92,A20r_L,93,Temporal Lobe,"ITG, Inferior Temporal Gyrus", rostral area 20,Limbic
+93,A20r_R,94,Temporal Lobe,"ITG, Inferior Temporal Gyrus", rostral area 20,Limbic
+94,A20il_L,95,Temporal Lobe,"ITG, Inferior Temporal Gyrus", intermediate lateral area 20,DMN
+95,A20il_R,96,Temporal Lobe,"ITG, Inferior Temporal Gyrus", intermediate lateral area 20,DMN
+96,A37vl_L,97,Temporal Lobe,"ITG, Inferior Temporal Gyrus", ventrolateral area 37,AN
+97,A37vl_R,98,Temporal Lobe,"ITG, Inferior Temporal Gyrus", ventrolateral area 37,AN
+98,A20cl_L,99,Temporal Lobe,"ITG, Inferior Temporal Gyrus", caudolateral of area 20,FPN
+99,A20cl_R,100,Temporal Lobe,"ITG, Inferior Temporal Gyrus", caudolateral of area 20,FPN
+100,A20cv_L,101,Temporal Lobe,"ITG, Inferior Temporal Gyrus", caudoventral of area 20,Cont
+101,A20cv_R,102,Temporal Lobe,"ITG, Inferior Temporal Gyrus", caudoventral of area 20,Cont
+102,A20rv_L,103,Temporal Lobe,"FuG, Fusiform Gyrus", rostroventral area 20,Vis
+103,A20rv_R,104,Temporal Lobe,"FuG, Fusiform Gyrus", rostroventral area 20,Vis
+104,A37mv_L,105,Temporal Lobe,"FuG, Fusiform Gyrus", medioventral area37,Vis
+105,A37mv_R,106,Temporal Lobe,"FuG, Fusiform Gyrus", medioventral area37,Vis
+106,A37lv_L,107,Temporal Lobe,"FuG, Fusiform Gyrus", lateroventral area37,AN
+107,A37lv_R,108,Temporal Lobe,"FuG, Fusiform Gyrus", lateroventral area37,AN
+108,A35/36r_L,109,Temporal Lobe,"PhG, Parahippocampal Gyrus", rostral area 35/36,Limbic
+109,A35/36r_R,110,Temporal Lobe,"PhG, Parahippocampal Gyrus", rostral area 35/36,Limbic
+110,A35/36c_L,111,Temporal Lobe,"PhG, Parahippocampal Gyrus", caudal area 35/36,Limbic
+111,A35/36c_R,112,Temporal Lobe,"PhG, Parahippocampal Gyrus", caudal area 35/36,Limbic
+112,TL_L,113,Temporal Lobe,"PhG, Parahippocampal Gyrus", area TL (lateral PPHC,DMN
+113,TL_R,114,Temporal Lobe,"PhG, Parahippocampal Gyrus", area TL (lateral PPHC,DMN
+114,A28/34_L,115,Temporal Lobe,"PhG, Parahippocampal Gyrus", area 28/34 (EC,Limbic
+115,A28/34_R,116,Temporal Lobe,"PhG, Parahippocampal Gyrus", area 28/34 (EC,Limbic
+116,TI_L,117,Temporal Lobe,"PhG, Parahippocampal Gyrus", area TI(temporal agranular insular cortex),Limbic
+117,TI_R,118,Temporal Lobe,"PhG, Parahippocampal Gyrus", area TI(temporal agranular insular cortex),Limbic
+118,TH_L,119,Temporal Lobe,"PhG, Parahippocampal Gyrus", area TH (medial PPHC),Limbic
+119,TH_R,120,Temporal Lobe,"PhG, Parahippocampal Gyrus", area TH (medial PPHC),Limbic
+120,rpSTS_L,121,Temporal Lobe,"pSTS, posterior Superior Temporal Sulcus ", rostroposterior superior temporal sulcus,DMN
+121,rpSTS_R,122,Temporal Lobe,"pSTS, posterior Superior Temporal Sulcus ", rostroposterior superior temporal sulcus,DMN
+122,cpSTS_L,123,Temporal Lobe,"pSTS, posterior Superior Temporal Sulcus ", caudoposterior superior temporal sulcus,DMN
+123,cpSTS_R,124,Temporal Lobe,"pSTS, posterior Superior Temporal Sulcus ", caudoposterior superior temporal sulcus,DMN
+124,A7r_L,125,Parietal Lobe,"SPL, Superior Parietal Lobule", rostral area 7,AN
+125,A7r_R,126,Parietal Lobe,"SPL, Superior Parietal Lobule", rostral area 7,AN
+126,A7c_L,127,Parietal Lobe,"SPL, Superior Parietal Lobule", caudal area 7,AN
+127,A7c_R,128,Parietal Lobe,"SPL, Superior Parietal Lobule", caudal area 7,AN
+128,A5l_L,129,Parietal Lobe,"SPL, Superior Parietal Lobule", lateral area 5,AN
+129,A5l_R,130,Parietal Lobe,"SPL, Superior Parietal Lobule", lateral area 5,AN
+130,A7pc_L,131,Parietal Lobe,"SPL, Superior Parietal Lobule", postcentral area 7,SMN
+131,A7pc_R,132,Parietal Lobe,"SPL, Superior Parietal Lobule", postcentral area 7,SMN
+132,A7ip_L,133,Parietal Lobe,"SPL, Superior Parietal Lobule", intraparietal area 7(hIP3),AN
+133,A7ip_R,134,Parietal Lobe,"SPL, Superior Parietal Lobule", intraparietal area 7(hIP3),AN
+134,A39c_L,135,Parietal Lobe,"IPL, Inferior Parietal Lobule", caudal area 39(PGp),Vis
+135,A39c_R,136,Parietal Lobe,"IPL, Inferior Parietal Lobule", caudal area 39(PGp),Vis
+136,A39rd_L,137,Parietal Lobe,"IPL, Inferior Parietal Lobule", rostrodorsal area 39(Hip3),FPN
+137,A39rd_R,138,Parietal Lobe,"IPL, Inferior Parietal Lobule", rostrodorsal area 39(Hip3),FPN
+138,A40rd_L,139,Parietal Lobe,"IPL, Inferior Parietal Lobule", rostrodorsal area 40(PFt),AN
+139,A40rd_R,140,Parietal Lobe,"IPL, Inferior Parietal Lobule", rostrodorsal area 40(PFt),AN
+140,A40c_L,141,Parietal Lobe,"IPL, Inferior Parietal Lobule", caudal area 40(PFm),DMN
+141,A40c_R,142,Parietal Lobe,"IPL, Inferior Parietal Lobule", caudal area 40(PFm),DMN
+142,A39rv_L,143,Parietal Lobe,"IPL, Inferior Parietal Lobule", rostroventral area 39(PGa),DMN
+143,A39rv_R,144,Parietal Lobe,"IPL, Inferior Parietal Lobule", rostroventral area 39(PGa),DMN
+144,A40rv_L,145,Parietal Lobe,"IPL, Inferior Parietal Lobule", rostroventral area 40(PFop),AN
+145,A40rv_R,146,Parietal Lobe,"IPL, Inferior Parietal Lobule", rostroventral area 40(PFop),AN
+146,A7m_L,147,Parietal Lobe,"Pcun, Precuneus", medial area 7(PEp),FPN
+147,A7m_R,148,Parietal Lobe,"Pcun, Precuneus", medial area 7(PEp),FPN
+148,A5m_L,149,Parietal Lobe,"Pcun, Precuneus", medial area 5(PEm),AN
+149,A5m_R,150,Parietal Lobe,"Pcun, Precuneus", medial area 5(PEm),AN
+150,dmPOS_L,151,Parietal Lobe,"Pcun, Precuneus", dorsomedial parietooccipital  sulcus(PEr) ,DMN
+151,dmPOS_R,152,Parietal Lobe,"Pcun, Precuneus", dorsomedial parietooccipital  sulcus(PEr) ,DMN
+152,A31_L,153,Parietal Lobe,"Pcun, Precuneus", area 31 (Lc1),DMN
+153,A31_R,154,Parietal Lobe,"Pcun, Precuneus", area 31 (Lc1),DMN
+154,A1/2/3ulhf_L,155,Parietal Lobe,"PoG, Postcentral Gyrus", area 1/2/3(upper limb,SMN
+155,A1/2/3ulhf_R,156,Parietal Lobe,"PoG, Postcentral Gyrus", area 1/2/3(upper limb,SMN
+156,A1/2/3tonIa_L,157,Parietal Lobe,"PoG, Postcentral Gyrus", area 1/2/3(tongue and larynx region),SMN
+157,A1/2/3tonIa_R,158,Parietal Lobe,"PoG, Postcentral Gyrus", area 1/2/3(tongue and larynx region),SMN
+158,A2_L,159,Parietal Lobe,"PoG, Postcentral Gyrus", area 2,SMN
+159,A2_R,160,Parietal Lobe,"PoG, Postcentral Gyrus", area 2,SMN
+160,A1/2/3tru_L,161,Parietal Lobe,"PoG, Postcentral Gyrus", area1/2/3(trunk region),SMN
+161,A1/2/3tru_R,162,Parietal Lobe,"PoG, Postcentral Gyrus", area1/2/3(trunk region),SMN
+162,G_L,163,Insular Lobe,"INS, Insular Gyrus", hypergranular insula,SMN
+163,G_R,164,Insular Lobe,"INS, Insular Gyrus", hypergranular insula,SMN
+164,vIa_L,165,Insular Lobe,"INS, Insular Gyrus", ventral agranular insula,DMN
+165,vIa_R,166,Insular Lobe,"INS, Insular Gyrus", ventral agranular insula,DMN
+166,dIa_L,167,Insular Lobe,"INS, Insular Gyrus", dorsal agranular insula,AN
+167,dIa_R,168,Insular Lobe,"INS, Insular Gyrus", dorsal agranular insula,AN
+168,vId/vIg_L,169,Insular Lobe,"INS, Insular Gyrus", ventral dysgranular and granular insula,AN
+169,vId/vIg_R,170,Insular Lobe,"INS, Insular Gyrus", ventral dysgranular and granular insula,AN
+170,dIg_L,171,Insular Lobe,"INS, Insular Gyrus", dorsal granular insula,SMN
+171,dIg_R,172,Insular Lobe,"INS, Insular Gyrus", dorsal granular insula,SMN
+172,dId_L,173,Insular Lobe,"INS, Insular Gyrus", dorsal dysgranular insula,AN
+173,dId_R,174,Insular Lobe,"INS, Insular Gyrus", dorsal dysgranular insula,AN
+174,A23d_L,175,Limbic Lobe,"CG, Cingulate Gyrus", dorsal area 23,DMN
+175,A23d_R,176,Limbic Lobe,"CG, Cingulate Gyrus", dorsal area 23,DMN
+176,A24rv_L,177,Limbic Lobe,"CG, Cingulate Gyrus", rostroventral area 24,FPN
+177,A24rv_R,178,Limbic Lobe,"CG, Cingulate Gyrus", rostroventral area 24,FPN
+178,A32p_L,179,Limbic Lobe,"CG, Cingulate Gyrus", pregenual area 32,DMN
+179,A32p_R,180,Limbic Lobe,"CG, Cingulate Gyrus", pregenual area 32,DMN
+180,A23v_L,181,Limbic Lobe,"CG, Cingulate Gyrus", ventral area 23,DMN
+181,A23v_R,182,Limbic Lobe,"CG, Cingulate Gyrus", ventral area 23,DMN
+182,A24cd_L,183,Limbic Lobe,"CG, Cingulate Gyrus", caudodorsal area 24,AN
+183,A24cd_R,184,Limbic Lobe,"CG, Cingulate Gyrus", caudodorsal area 24,AN
+184,A23c_L,185,Limbic Lobe,"CG, Cingulate Gyrus", caudal area 23,AN
+185,A23c_R,186,Limbic Lobe,"CG, Cingulate Gyrus", caudal area 23,AN
+186,A32sg_L,187,Limbic Lobe,"CG, Cingulate Gyrus", subgenual area 32,DMN
+187,A32sg_R,188,Limbic Lobe,"CG, Cingulate Gyrus", subgenual area 32,DMN
+188,cLinG_L,189,Occipital Lobe,"MVOcC, MedioVentral Occipital Cortex", caudal lingual gyrus,Vis
+189,cLinG_R,190,Occipital Lobe,"MVOcC, MedioVentral Occipital Cortex", caudal lingual gyrus,Vis
+190,rCunG_L,191,Occipital Lobe,"MVOcC, MedioVentral Occipital Cortex", rostral cuneus gyrus,Vis
+191,rCunG_R,192,Occipital Lobe,"MVOcC, MedioVentral Occipital Cortex", rostral cuneus gyrus,Vis
+192,cCunG_L,193,Occipital Lobe,"MVOcC, MedioVentral Occipital Cortex", caudal cuneus gyrus,Vis
+193,cCunG_R,194,Occipital Lobe,"MVOcC, MedioVentral Occipital Cortex", caudal cuneus gyrus,Vis
+194,rLinG_L,195,Occipital Lobe,"MVOcC, MedioVentral Occipital Cortex", rostral lingual gyrus,Vis
+195,rLinG_R,196,Occipital Lobe,"MVOcC, MedioVentral Occipital Cortex", rostral lingual gyrus,Vis
+196,vmPOS_L,197,Occipital Lobe,"MVOcC, MedioVentral Occipital Cortex",ventromedial parietooccipital sulcus,Vis
+197,vmPOS_R,198,Occipital Lobe,"MVOcC, MedioVentral Occipital Cortex",ventromedial parietooccipital sulcus,Vis
+198,mOccG_L,199,Occipital Lobe,"LOcC, lateral Occipital Cortex", middle occipital gyrus,Vis
+199,mOccG_R,200,Occipital Lobe,"LOcC, lateral Occipital Cortex", middle occipital gyrus,Vis
+200,V5/MT+_L,201,Occipital Lobe,"LOcC, lateral Occipital Cortex", area V5/MT+,Vis
+201,V5/MT+_R,202,Occipital Lobe,"LOcC, lateral Occipital Cortex", area V5/MT+,Vis
+202,OPC_L,203,Occipital Lobe,"LOcC, lateral Occipital Cortex", occipital polar cortex,Vis
+203,OPC_R,204,Occipital Lobe,"LOcC, lateral Occipital Cortex", occipital polar cortex,Vis
+204,iOccG_L,205,Occipital Lobe,"LOcC, lateral Occipital Cortex", inferior occipital gyrus,Vis
+205,iOccG_R,206,Occipital Lobe,"LOcC, lateral Occipital Cortex", inferior occipital gyrus,Vis
+206,msOccG_L,207,Occipital Lobe,"LOcC, lateral Occipital Cortex", medial superior occipital gyrus,Vis
+207,msOccG_R,208,Occipital Lobe,"LOcC, lateral Occipital Cortex", medial superior occipital gyrus,Vis
+208,lsOccG_L,209,Occipital Lobe,"LOcC, lateral Occipital Cortex", lateral superior occipital gyrus,Vis
+209,lsOccG_R,210,Occipital Lobe,"LOcC, lateral Occipital Cortex", lateral superior occipital gyrus,Vis
+210,mAmyg_L,211,Subcortical Nuclei,"Amyg, Amygdala", medial amygdala,
+211,mAmyg_R,212,Subcortical Nuclei,"Amyg, Amygdala", medial amygdala,
+212,lAmyg_L,213,Subcortical Nuclei,"Amyg, Amygdala", lateral amygdala,
+213,lAmyg_R,214,Subcortical Nuclei,"Amyg, Amygdala", lateral amygdala,
+214,rHipp_L,215,Subcortical Nuclei,"Hipp, Hippocampus", rostral hippocampus,
+215,rHipp_R,216,Subcortical Nuclei,"Hipp, Hippocampus", rostral hippocampus,
+216,cHipp_L,217,Subcortical Nuclei,"Hipp, Hippocampus", caudal hippocampus,
+217,cHipp_R,218,Subcortical Nuclei,"Hipp, Hippocampus", caudal hippocampus,
+218,vCa_L,219,Subcortical Nuclei,"BG, Basal Ganglia", ventral caudate,
+219,vCa_R,220,Subcortical Nuclei,"BG, Basal Ganglia", ventral caudate,
+220,GP_L,221,Subcortical Nuclei,"BG, Basal Ganglia", globus pallidus,
+221,GP_R,222,Subcortical Nuclei,"BG, Basal Ganglia", globus pallidus,
+222,NAC_L,223,Subcortical Nuclei,"BG, Basal Ganglia", nucleus accumbens,
+223,NAC_R,224,Subcortical Nuclei,"BG, Basal Ganglia", nucleus accumbens,
+224,vmPu_L,225,Subcortical Nuclei,"BG, Basal Ganglia", ventromedial putamen,
+225,vmPu_R,226,Subcortical Nuclei,"BG, Basal Ganglia", ventromedial putamen,
+226,dCa_L,227,Subcortical Nuclei,"BG, Basal Ganglia", dorsal caudate,
+227,dCa_R,228,Subcortical Nuclei,"BG, Basal Ganglia", dorsal caudate,
+228,dlPu_L,229,Subcortical Nuclei,"BG, Basal Ganglia", dorsolateral putamen,
+229,dlPu_R,230,Subcortical Nuclei,"BG, Basal Ganglia", dorsolateral putamen,
+230,mPFtha_L,231,Subcortical Nuclei,"Tha, Thalamus", medial pre-frontal thalamus,
+231,mPFtha_R,232,Subcortical Nuclei,"Tha, Thalamus", medial pre-frontal thalamus,
+232,mPMtha_L,233,Subcortical Nuclei,"Tha, Thalamus", pre-motor thalamus,
+233,mPMtha_R,234,Subcortical Nuclei,"Tha, Thalamus", pre-motor thalamus,
+234,Stha_L,235,Subcortical Nuclei,"Tha, Thalamus", sensory thalamus,
+235,Stha_R,236,Subcortical Nuclei,"Tha, Thalamus", sensory thalamus,
+236,rTtha_L,237,Subcortical Nuclei,"Tha, Thalamus", rostral temporal thalamus,
+237,rTtha_R,238,Subcortical Nuclei,"Tha, Thalamus", rostral temporal thalamus,
+238,PPtha_L,239,Subcortical Nuclei,"Tha, Thalamus", posterior parietal thalamus,
+239,PPtha_R,240,Subcortical Nuclei,"Tha, Thalamus", posterior parietal thalamus,
+240,Otha_L,241,Subcortical Nuclei,"Tha, Thalamus", occipital thalamus,
+241,Otha_R,242,Subcortical Nuclei,"Tha, Thalamus", occipital thalamus,
+242,cTtha_L,243,Subcortical Nuclei,"Tha, Thalamus", caudal temporal thalamus,
+243,cTtha_R,244,Subcortical Nuclei,"Tha, Thalamus", caudal temporal thalamus,
+244,lPFtha_L,245,Subcortical Nuclei,"Tha, Thalamus", lateral pre-frontal thalamus,
+245,lPFtha_R,246,Subcortical Nuclei,"Tha, Thalamus", lateral pre-frontal thalamus,
+246,Cereb_0,247,Cerebellum,Cerebellum,Unknown,
+247,Cereb_1,248,Cerebellum,Cerebellum,Unknown,
+248,Cereb_2,249,Cerebellum,Cerebellum,Unknown,
+249,Cereb_3,250,Cerebellum,Cerebellum,Unknown,
+250,Cereb_4,251,Cerebellum,Cerebellum,Unknown,
+251,Cereb_5,252,Cerebellum,Cerebellum,Unknown,
+252,Cereb_6,253,Cerebellum,Cerebellum,Unknown,
+253,Cereb_7,254,Cerebellum,Cerebellum,Unknown,
+254,Cereb_8,255,Cerebellum,Cerebellum,Unknown,
+255,Cereb_9,256,Cerebellum,Cerebellum,Unknown,
+256,Cereb_10,257,Cerebellum,Cerebellum,Unknown,
+257,Cereb_11,258,Cerebellum,Cerebellum,Unknown,
+258,Cereb_12,259,Cerebellum,Cerebellum,Unknown,
+259,Cereb_13,260,Cerebellum,Cerebellum,Unknown,
+260,Cereb_14,261,Cerebellum,Cerebellum,Unknown,
+261,Cereb_15,262,Cerebellum,Cerebellum,Unknown,
+262,Cereb_16,263,Cerebellum,Cerebellum,Unknown,
+263,Cereb_17,264,Cerebellum,Cerebellum,Unknown,
+264,Cereb_18,265,Cerebellum,Cerebellum,Unknown,
+265,Cereb_19,266,Cerebellum,Cerebellum,Unknown,
+266,Cereb_20,267,Cerebellum,Cerebellum,Unknown,
+267,Cereb_21,268,Cerebellum,Cerebellum,Unknown,
+268,Cereb_22,269,Cerebellum,Cerebellum,Unknown,
+269,Cereb_23,270,Cerebellum,Cerebellum,Unknown,
+270,Cereb_24,271,Cerebellum,Cerebellum,Unknown,
+271,Cereb_25,272,Cerebellum,Cerebellum,Unknown,
+272,Cereb_26,273,Cerebellum,Cerebellum,Unknown,
+273,Cereb_27,274,Cerebellum,Cerebellum,Unknown,
