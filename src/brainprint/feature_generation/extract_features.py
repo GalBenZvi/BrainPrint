@@ -7,14 +7,18 @@ from typing import Callable, Dict
 
 import pandas as pd
 import tqdm
+from brainprint.feature_generation.cli import parser
+from brainprint.feature_generation.subject_results import SubjectResults
 from brainprint.feature_generation.utils.features import FEATURES
+from brainprint.feature_generation.utils.parcellation import (
+    parcellate_metric,
+    parcellation_labels,
+)
 from brainprint.utils import Modality
-
-from utils.parcellation import parcellate_metric, parcellation_labels
 
 
 def parcellate_subject(
-    needed_files: dict,
+    results_dict: dict,
     atlas_template: pd.DataFrame = parcellation_labels,
     features: dict = FEATURES,
 ) -> pd.DataFrame:
@@ -23,7 +27,7 @@ def parcellate_subject(
 
     Parameters
     ----------
-    needed_files : dict
+    results_dict : dict
         Dictionary containing locations of needed files
     atlas_template : pd.DataFrame, optional
         Parcellation's template DataFrame, by default parcellation_labels
@@ -33,7 +37,7 @@ def parcellate_subject(
     pd.DataFrame
         Subject's metrics parcellated into a DataFrame
     """
-    data_dict = needed_files.get("Features", {})
+    data_dict = results_dict.get("Features", {})
     structural_derivatives = data_dict.get(Modality.STRUCTURAL, {})
     native_parcellation = structural_derivatives.get("native_parcellation")
     sessions = list(data_dict.get(Modality.DIFFUSION).keys())
@@ -42,9 +46,7 @@ def parcellate_subject(
         for modality in features.keys():
             for metric in features.get(modality):
                 session_id = (
-                    FIRST_SESSION
-                    if modality == Modality.STRUCTURAL
-                    else session_id
+                    "ses-1" if modality == Modality.STRUCTURAL else session_id
                 )
                 metric_fname = (
                     data_dict.get(modality).get(session_id).get(metric)
@@ -56,11 +58,11 @@ def parcellate_subject(
 
 
 if __name__ == "__main__":
-    base_dir = Path("/media/groot/Yalla/media/MRI")
-    out_dir = base_dir / "derivatives" / "data_processing" / DEFAULT_ATLAS_NAME
+    args = parser.parse_args()
+    base_dir = Path(args.base_dir)
+    out_dir = base_dir / "derivatives" / "data_processing" / args.atlas
     out_dir.mkdir(exist_ok=True, parents=True)
-    valid_subjects = generate_preprocessed_subjects(base_dir)
-    for subj in tqdm.tqdm(valid_subjects):
-        needed_files = locate_subject_files(base_dir, subj)
-        parcellate_subject(needed_files)
-        break
+    subjects = (base_dir / "NIfTI").glob("sub-*")
+    for subject_dir in tqdm.tqdm(subjects):
+        results = SubjectResults(base_dir, subject_dir.name)
+        parcellate_subject(results.results_dict)
