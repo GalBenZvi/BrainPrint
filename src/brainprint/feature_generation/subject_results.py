@@ -100,9 +100,9 @@ class SubjectResults:
                 ] = derivative_path
         return subject_derivatives
 
-    def locate_subject_files(self, atlas_name: str = None) -> dict:
+    def get_derivative_dict(self, atlas_name: str = None) -> dict:
         """
-        Locate subject's needed files for parcellation of features.
+        Locate subject's needed files for extraction of features.
 
         Parameters
         ----------
@@ -115,7 +115,7 @@ class SubjectResults:
             Dictionary comprised of paths to needed files and their corresponding
             keys
         """
-        atlas_name = atlas_name or self.DEFAULT_ATLAS
+        atlas_name = atlas_name or self.DEFAULT_ATLAS_NAME
         subject_dict = defaultdict(dict)
         for modality, getter_name in self.DERIVATIVES_FROM_MODALITY.items():
             getter = getattr(self, getter_name, None)
@@ -134,6 +134,10 @@ class SubjectResults:
     @property
     def structural_derivatives_path(self) -> Path:
         return self.get_structural_derivatives_path()
+
+    @property
+    def derivative_dict(self) -> dict:
+        return self.get_derivative_dict()
 
     # def check_subject_derivatives(base_dir: Path, subject_id: str) -> bool:
     #     """
