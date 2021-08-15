@@ -22,6 +22,8 @@ class SubjectResults:
     }
     PARAMETERS: Dict[Modality, List[str]] = FEATURES
 
+    _results_dict: dict = None
+
     def __init__(self, base_dir: Path, subject_id: str) -> None:
         self.base_dir = base_dir
         self.subject_id = subject_id
@@ -137,4 +139,6 @@ class SubjectResults:
 
     @property
     def derivative_dict(self) -> dict:
-        return self.get_derivative_dict()
+        if self._results_dict is None:
+            self._results_dict = self.get_derivative_dict()
+        return self._results_dict
