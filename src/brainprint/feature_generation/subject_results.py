@@ -30,7 +30,8 @@ class SubjectResults:
 
     #: Diffusion-weighted imaging preprocessing results directory.
     DIFFUSION_RELATIVE_PATH: str = "derivatives/dwiprep"
-    TENSOR_DIRECTORY_PATH: str = "tensors_parameters/coreg_FS"
+    TENSOR_COREG_DIRECTORY_PATH: str = "tensors_parameters/coreg_FS"
+    TENSOR_NATIVE_DIRECTORY_PATH: str = "tensors_parameters/native"
 
     #: Functional imaging preprocessing results.
     FUNCTIONAL_RELATIVE_PATH: str = "derivatives/fmriprep"
@@ -47,7 +48,7 @@ class SubjectResults:
 
     #: Dispatch table from modality to derivative paths generation function.
     DERIVATIVES_FROM_MODALITY: Dict[Modality, Callable] = {
-        Modality.DIFFUSION: "get_dwi_paths",
+        Modality.DIFFUSION: "get_coregistered_dwi_paths",
         Modality.STRUCTURAL: "get_smri_paths",
     }
 
@@ -112,10 +113,11 @@ class SubjectResults:
         """
         functional = self.get_functional_derivatives_path()
         sessions = list(functional.glob(self.SESSION_DIRECTORY_PATTERN))
+
         if not sessions:
             return
-        longitudinal = len(sessions) > 1
-        buffer_dir = "" if longitudinal else sessions[0]
+        self.longitudinal = len(sessions) > 1
+        buffer_dir = "" if self.longitudinal else sessions[0]
         return functional / buffer_dir / self.STRUCTURAL_DERIVATIVE_DIR
 
     def get_subject_parcellation(self, atlas_name: str = None) -> Path:
@@ -143,9 +145,99 @@ class SubjectResults:
             warnings.warn(message)
         return path
 
+    def get_standard_to_native_xfm(self) -> Path:
+        """
+        Returns the path of the nonlinear transformation from standard to subject's native space.
+        Returns
+        -------
+        Path
+            Standard to native space transformation h5 file.
+        """
+        buffer = (
+            f"_{self.structural_derivatives_path.parent.name}"
+            if not self.longitudinal
+            else ""
+        )
+        return (
+            self.structural_derivatives_path
+            / f"{self.subject_id}{buffer}_from-MNI152NLin2009cAsym_to-T1w_mode-image_xfm.h5"
+        )
+
+    def get_native_gm_mask(self) -> Path:
+        """
+        Returns the path of the native gray matter probabalistic mask.
+        Returns
+        -------
+        Path
+            Native gray matter probabalistic mask.
+        """
+        buffer = (
+            f"_{self.structural_derivatives_path.parent.name}"
+            if not self.longitudinal
+            else ""
+        )
+        return (
+            self.structural_derivatives_path
+            / f"{self.subject_id}{buffer}_label-GM_probseg.nii.gz"
+        )
+
+    def get_preprocessed_T1w(self) -> Path:
+        """
+        Returns the path of the native preprocessed T1w image.
+        Returns
+        -------
+        Path
+            Native preprocessed T1w image.
+        """
+        buffer = (
+            f"_{self.structural_derivatives_path.parent.name}"
+            if not self.longitudinal
+            else ""
+        )
+        return (
+            self.structural_derivatives_path
+            / f"{self.subject_id}{buffer}_desc-preproc_T1w.nii.gz"
+        )
+
+    def get_brain_mask(self) -> Path:
+        """
+        Returns the path of the native preprocessed T1w brain mask.
+        Returns
+        -------
+        Path
+            Native preprocessed T1w brain mask
+        """
+        buffer = (
+            f"_{self.structural_derivatives_path.parent.name}"
+            if not self.longitudinal
+            else ""
+        )
+        return (
+            self.structural_derivatives_path
+            / f"{self.subject_id}{buffer}_desc-brain_mask.nii.gz"
+        )
+
+    def get_T1w_brain(self) -> Path:
+        """
+        Returns the path of the native preprocessed T1w brain.
+        Returns
+        -------
+        Path
+            Native preprocessed T1w brain
+        """
+        buffer = (
+            f"_{self.structural_derivatives_path.parent.name}"
+            if not self.longitudinal
+            else ""
+        )
+        return (
+            self.structural_derivatives_path
+            / f"{self.subject_id}{buffer}_desc-brain.nii.gz"
+        )
+
     def get_dwi_paths(self) -> dict:
         """
-        Locates tensor-derived metrics files within subject's dwiprep outputs.
+        Locates native-space tensor-derived metrics files within subject's dwiprep outputs.
 
         Returns
         -------
@@ -159,7 +251,35 @@ class SubjectResults:
         for session_dir in session_dirs:
             session_id = session_dir.name
             tensor_dir = (
-                derivatives_dir / session_id / self.TENSOR_DIRECTORY_PATH
+                derivatives_dir
+                / session_id
+                / self.TENSOR_NATIVE_DIRECTORY_PATH
+            )
+            for parameter in self.PARAMETERS.get(Modality.DIFFUSION):
+                derivative_path = tensor_dir / f"{parameter}.mif"
+                if derivative_path.exists():
+                    subject_derivatives[session_id][
+                        parameter
+                    ] = derivative_path
+        return subject_derivatives
+
+    def get_coregistered_dwi_paths(self) -> dict:
+        """
+        Locates coregistered tensor-derived metrics files within subject's dwiprep outputs.
+
+        Returns
+        -------
+        dict
+            A dictionary comprised of tensor-derived metrics files' paths for each
+            of subject's sessions
+        """
+        derivatives_dir = self.diffusion_derivatives_path
+        subject_derivatives = defaultdict(dict)
+        session_dirs = derivatives_dir.glob(self.SESSION_DIRECTORY_PATTERN)
+        for session_dir in session_dirs:
+            session_id = session_dir.name
+            tensor_dir = (
+                derivatives_dir / session_id / self.TENSOR_COREG_DIRECTORY_PATH
             )
             for parameter in self.PARAMETERS.get(Modality.DIFFUSION):
                 derivative_path = tensor_dir / f"{parameter}.nii.gz"
@@ -303,9 +423,25 @@ class SubjectResults:
             self._results_dict = self.get_derivative_dict()
         return self._results_dict
 
+    @property
+    def gm_mask(self) -> Path:
+        return self.get_native_gm_mask()
+
+    @property
+    def preprocessed_t1w(self) -> Path:
+        return self.get_preprocessed_T1w()
+
+    @property
+    def t1w_brain(self) -> Path:
+        return self.get_T1w_brain()
+
+    @property
+    def brain_mask(self) -> Path:
+        return self.get_brain_mask()
+
 
 if __name__ == "__main__":
     base_dir = Path("/media/groot/Yalla/media/MRI")
     subj_id = "sub-233"
     res = SubjectResults(base_dir, subj_id)
-    print(res.summarize_subject_metrics())
+    print(res.get_dwi_paths())
