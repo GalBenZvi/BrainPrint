@@ -35,6 +35,14 @@ class SubjectResults:
         self.subject_id = subject_id
         self.native_parcellation = self.get_subject_parcellation()
 
+    def get_functional_sessions(self) -> list:
+        return [
+            ses.name
+            for ses in self.functional_derivatives_path.glob(
+                self.SESSION_DIRECTORY_PATTERN
+            )
+        ]
+
     def get_diffusion_derivatives_path(self) -> Path:
         return self.base_dir / self.DIFFUSION_RELATIVE_PATH / self.subject_id
 
@@ -185,18 +193,18 @@ class SubjectResults:
         atlas_img = nib.load(self.get_subject_parcellation())
         atlas_data = atlas_img.get_fdata()
         subject_metrics = {}
-        for key in self.derivative_dict.keys():
-            for ses in self.derivative_dict.get(key).keys():
-                template_df = pd.read_csv(
-                    parcellations.get("Brainnetome").get("labels"), index_col=0
-                ).copy()
+        for ses in [self.FIRST_SESSION]:  ### WE NEED TO TALK ABOUT THIS
+            template_df = pd.read_csv(
+                parcellations.get("Brainnetome").get("labels"), index_col=0
+            ).copy()
+            for key in self.derivative_dict.keys():
                 for metric, path in (
                     self.derivative_dict.get(key).get(ses).items()
                 ):
                     template_df[metric] = self.parcellate_metric(
                         path, atlas_data, template_df
                     )
-                subject_metrics[ses] = template_df
+            subject_metrics[ses] = template_df
         return subject_metrics
 
     @property
@@ -216,6 +224,10 @@ class SubjectResults:
         if self._results_dict is None:
             self._results_dict = self.get_derivative_dict()
         return self._results_dict
+
+    @property
+    def sessions(self) -> list:
+        return self.get_functional_sessions()
 
 
 if __name__ == "__main__":

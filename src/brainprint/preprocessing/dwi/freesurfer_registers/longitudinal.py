@@ -1,10 +1,11 @@
 from logging import log
 from pathlib import Path
 from re import L
-import nipype
 from nipype.interfaces.ants import ApplyTransforms
 from nipype.interfaces import fsl
 import os
+import nibabel as nib
+import numpy as np
 
 
 def at_ants(in_file, ref, xfm, outfile, nn: bool, invert_xfm: bool = False):
@@ -40,6 +41,21 @@ def applyxfm_fsl(in_file, xfm, ref, out_file):
     ax.run()
 
 
+def crop_to_gm(native_parcels: Path, gm_probseg: Path):
+    cropped_parcels = (
+        native_parcels.parent
+        / f"{native_parcels.name.split('.')[0]}_GM.nii.gz"
+    )
+    if not cropped_parcels.exists():
+        gm_mask = nib.load(gm_probseg).get_fdata().astype(bool)
+        orig_img = nib.load(native_parcels)
+        gm_parcels = orig_img.get_fdata()
+        gm_parcels[~gm_mask] = np.nan
+        gm_img = nib.Nifti1Image(gm_parcels, orig_img.affine)
+        nib.save(gm_img, cropped_parcels)
+    return cropped_parcels
+
+
 def atlas_to_subject_space(
     func_derivatives: Path,
     atlas_file: Path,
@@ -52,6 +68,12 @@ def atlas_to_subject_space(
         / "anat"
         / f"{subj.name}_from-MNI152NLin2009cAsym_to-T1w_mode-image_xfm.h5"
     )
+    gm_prob = (
+        func_derivatives
+        / subj.name
+        / "anat"
+        / f"{subj.name}_label-GM_probseg.nii.gz"
+    )
     ref = fs_transform.with_name(f"{subj.name}_desc-preproc_T1w.nii.gz")
     out_file = fs_transform.with_name(f"{atlas_name}_native.nii.gz")
     # out_file.parent.mkdir(exist_ok=True, parents=True)
@@ -59,6 +81,7 @@ def atlas_to_subject_space(
         return
     # try:
     at_ants(atlas_file, ref, fs_transform, out_file, nn=True)
+    crop_to_gm(out_file, gm_prob)
 
 
 def coreg_to_freesurfer(func_derivatives: Path, subj: Path):
