@@ -1,47 +1,115 @@
+"""
+Definition of the :class:`SubjectResults` class.
+"""
 import warnings
 from collections import defaultdict
 from pathlib import Path
 from typing import Callable, Dict, List
-from brainprint.feature_generation.utils.parcellation import parcellate_metric
 
-import tqdm
-import pandas as pd
 import nibabel as nib
 import numpy as np
+import pandas as pd
+from brainprint.feature_generation import messages
 from brainprint.feature_generation.utils.features import FEATURES
+from brainprint.feature_generation.utils.parcellation import parcellate_metric
 from brainprint.utils import Modality, parcellations
 
 
 class SubjectResults:
+    """
+    Facilitates navigation and extraction of BIDS-compatible preprocessing
+    results.
+    """
+
+    #: Default atlas name to use for calculating regional statistics.
     DEFAULT_ATLAS_NAME: str = "Brainnetome"
+
+    #: Name of the BIDS directory containing NIfTI-formatted scans and
+    #: metadata.
     BIDS_DIR_NAME: str = "NIfTI"
+
+    #: Diffusion-weighted imaging preprocessing results directory.
     DIFFUSION_RELATIVE_PATH: str = "derivatives/dwiprep"
+    TENSOR_DIRECTORY_PATH: str = "tensors_parameters/coreg_FS"
+
+    #: Functional imaging preprocessing results.
     FUNCTIONAL_RELATIVE_PATH: str = "derivatives/fmriprep"
+
+    #: Name of the structural derivatives directory within fMRIPrep's results.
     STRUCTURAL_DERIVATIVE_DIR: str = "anat"
+
+    #: Pattern to use for sessions in the BIDS directory hierarchy.
     SESSION_DIRECTORY_PATTERN: str = "ses-*"
     FIRST_SESSION: str = "ses-1"
+
+    #: Pattern to use for subjects in the BIDS directory hierarchy.
     SUBJECT_DIRECTORY_PATTERN: str = "sub-*"
-    TENSOR_DIRECTORY_PATH: str = "tensors_parameters/coreg_FS"
+
+    #: Dispatch table from modality to derivative paths generation function.
     DERIVATIVES_FROM_MODALITY: Dict[Modality, Callable] = {
         Modality.DIFFUSION: "get_dwi_paths",
         Modality.STRUCTURAL: "get_smri_paths",
     }
+
+    #: Parameters to be extracted by modality.
     PARAMETERS: Dict[Modality, List[str]] = FEATURES
 
+    #: Native grey matter parcellation file template.
+    NATIVE_GM_PATTERN: str = "{atlas_name}_native_GM.nii.gz"
+
+    #: File name pattern to use to locate sMRI derivatives.
+    SMRI_DERIVATIVE_PATTERN: str = "{subject_id}_{parameter}.nii.gz"
+
+    # Cached reference of the derivates dictionary.
     _results_dict: dict = None
 
     def __init__(self, base_dir: Path, subject_id: str) -> None:
-        self.base_dir = base_dir
-        self.subject_id = subject_id
-        self.native_parcellation = self.get_subject_parcellation()
+        """
+        Initialize a new :class:`SubjectResults` instance.
+
+        Parameters
+        ----------
+        base_dir : Path
+            Base project directory
+        subject_id : str
+            Subject ID to extract parameters for
+        """
+        self.base_dir: Path = Path(base_dir)
+        self.subject_id: str = subject_id
+        self.native_parcellation: Path = self.get_subject_parcellation()
 
     def get_diffusion_derivatives_path(self) -> Path:
+        """
+        Returns the path of the diffusion-weighted imaging preprocessing
+        derivatives.
+
+        Returns
+        -------
+        Path
+            DWI preprocessing derivatives
+        """
         return self.base_dir / self.DIFFUSION_RELATIVE_PATH / self.subject_id
 
     def get_functional_derivatives_path(self) -> Path:
+        """
+        Returns the path of the functional imaging preprocessing derivatives.
+
+        Returns
+        -------
+        Path
+            fMRI preprocessing derivatives
+        """
         return self.base_dir / self.FUNCTIONAL_RELATIVE_PATH / self.subject_id
 
     def get_structural_derivatives_path(self) -> Path:
+        """
+        Returns the path of the sMRI preprocessing derivatives.
+
+        Returns
+        -------
+        Path
+            sMRI preprocessing derivatives
+        """
         functional = self.get_functional_derivatives_path()
         sessions = list(functional.glob(self.SESSION_DIRECTORY_PATTERN))
         if not sessions:
@@ -51,15 +119,29 @@ class SubjectResults:
         return functional / buffer_dir / self.STRUCTURAL_DERIVATIVE_DIR
 
     def get_subject_parcellation(self, atlas_name: str = None) -> Path:
+        """
+        Returns the path of the native grey matter parcellation file for this
+        subject.
+
+        Parameters
+        ----------
+        atlas_name : str, optional
+            Atlas name to find the parcellation file by, by default None
+
+        Returns
+        -------
+        Path
+            Native grey matter parcellation
+        """
         atlas_name = atlas_name or self.DEFAULT_ATLAS_NAME
-        atlas_file = f"{atlas_name}_native_GM.nii.gz"
+        atlas_file = self.NATIVE_GM_PATTERN.format(atlas_name=atlas_name)
         path = self.structural_derivatives_path / atlas_file
         if not path.exists():
-            warnings.warn(
-                f"Subject {self.subject_id} does not have a native GM parcellation."
+            message = messages.MISSING_PARCELLATION.format(
+                subject_id=self.subject_id
             )
-        else:
-            return self.structural_derivatives_path / atlas_file
+            warnings.warn(message)
+        return path
 
     def get_dwi_paths(self) -> dict:
         """
@@ -89,16 +171,10 @@ class SubjectResults:
 
     def get_smri_paths(
         self,
-        atlas_name: str = DEFAULT_ATLAS_NAME,
     ) -> dict:
         """
         Returns the paths of structural preprocessing derivatives of the first
         session.
-
-        Parameters
-        ----------
-        atlas_name : str
-            Atlas name
 
         Returns
         -------
@@ -107,10 +183,10 @@ class SubjectResults:
         """
         subject_derivatives = defaultdict(dict)
         for parameter in self.PARAMETERS.get(Modality.STRUCTURAL):
-            derivative_file = f"{self.subject_id}_{parameter.lower()}.nii.gz"
-            derivative_path = (
-                self.structural_derivatives_path / derivative_file
+            name = self.SMRI_DERIVATIVE_PATTERN.format(
+                subject_id=self.subject_id, parameter=parameter.lower()
             )
+            derivative_path = self.structural_derivatives_path / name
             if derivative_path.exists():
                 subject_derivatives[self.FIRST_SESSION][
                     parameter
@@ -180,23 +256,33 @@ class SubjectResults:
             temp[i] = np.nanmean(metric_data[mask.astype(bool)])
         return temp
 
-    def summarize_subject_metrics(self, atlas_name: str = None):
+    def summarize_subject_metrics(
+        self, atlas_name: str = None
+    ) -> pd.DataFrame:
+        """
+        Returns subject parameters across modalities summarized by region.
+
+        Parameters
+        ----------
+        atlas_name : str, optional
+            Atlas to use for regional statistics calculation, by default None
+
+        Returns
+        -------
+        pd.DataFrame
+            Summarized subject parameters
+        """
         atlas_name = atlas_name or self.DEFAULT_ATLAS_NAME
-        atlas_img = nib.load(self.get_subject_parcellation())
-        atlas_data = atlas_img.get_fdata()
+        atlas_data = nib.load(self.native_parcellation).get_fdata()
+        atlas_labels = parcellations.get(atlas_name).get("labels")
+        template_df = pd.read_csv(atlas_labels, index_col=0)
         subject_metrics = {}
-        for key in self.derivative_dict.keys():
-            for ses in self.derivative_dict.get(key).keys():
-                template_df = pd.read_csv(
-                    parcellations.get("Brainnetome").get("labels"), index_col=0
-                ).copy()
-                for metric, path in (
-                    self.derivative_dict.get(key).get(ses).items()
-                ):
-                    template_df[metric] = self.parcellate_metric(
-                        path, atlas_data, template_df
-                    )
-                subject_metrics[ses] = template_df
+        for sessions_dict in self.derivative_dict.values():
+            for session_id, metric_derivatives in sessions_dict.items():
+                df = template_df.copy()
+                for metric, path in metric_derivatives.items():
+                    df[metric] = self.parcellate_metric(path, atlas_data, df)
+                subject_metrics[session_id] = df
         return subject_metrics
 
     @property
