@@ -3,7 +3,13 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Callable, Dict, List
 from brainprint.feature_generation.utils.parcellation import parcellate_metric
-
+from brainprint.feature_generation.utils.functions import (
+    at_ants,
+    coregister_tensors_single_session,
+    crop_to_mask,
+    epi_reg,
+    coregister_tensors_longitudinal,
+)
 import tqdm
 import pandas as pd
 import nibabel as nib
@@ -16,13 +22,13 @@ class SubjectResults:
     DEFAULT_ATLAS_NAME: str = "Brainnetome"
     BIDS_DIR_NAME: str = "NIfTI"
     DIFFUSION_RELATIVE_PATH: str = "derivatives/dwiprep"
-<<<<<<< HEAD
     TENSOR_COREG_DIRECTORY_PATH: str = "tensors_parameters/coreg_FS"
     TENSOR_NATIVE_DIRECTORY_PATH: str = "tensors_parameters/native"
 
+    #: Diffusion imaging preprocessing results.
+    REGISTERATION_DIRECTORY_PATH: str = "registrations"
+    FREESURFER_REGISTERATION_PATH: str = "registrations/preprocessed_FS"
     #: Functional imaging preprocessing results.
-=======
->>>>>>> 8f62c0e286b19eafebf4c63b5afaa018b7109696
     FUNCTIONAL_RELATIVE_PATH: str = "derivatives/fmriprep"
     STRUCTURAL_DERIVATIVE_DIR: str = "anat"
     SESSION_DIRECTORY_PATTERN: str = "ses-*"
@@ -72,10 +78,37 @@ class SubjectResults:
         path = self.structural_derivatives_path / atlas_file
         if not path.exists():
             warnings.warn(
-                f"Subject {self.subject_id} does not have a native GM parcellation."
+                f"Subject {self.subject_id} does not have a native GM parcellation.\nWill try to generate one."
             )
+            try:
+                self.coregister_atlas_to_native(atlas_name)
+            except Exception:
+                warnings.warn(f"Native GM parcellation was unsuccessful")
         else:
             return self.structural_derivatives_path / atlas_file
+
+    def coregister_atlas_to_native(self, atlas_name: str = None):
+        """
+        Coregister atlas from standard space to subject's native space
+        Parameters
+        ----------
+        atlas_name : str, optional
+            [description], by default None
+        """
+        atlas_name = atlas_name or self.DEFAULT_ATLAS_NAME
+        coregistered_atlas = (
+            self.native_parcellation.parent
+            / self.native_parcellation.name.replace("_GM", "")
+        )
+        if not coregistered_atlas.exists():
+            at_ants(
+                parcellations.get(atlas_name).get("atlas"),
+                self.t1w_brain,
+                self.standard_to_native_transform,
+                coregistered_atlas,
+            )
+        cropped_to_gm = self.native_parcellation
+        crop_to_mask(coregistered_atlas, self.gm_mask, cropped_to_gm)
 
     def get_standard_to_native_xfm(self) -> Path:
         """
@@ -166,6 +199,77 @@ class SubjectResults:
             self.structural_derivatives_path
             / f"{self.subject_id}{buffer}_desc-brain.nii.gz"
         )
+
+    def get_mean_b0(self) -> Path:
+        """
+        Returns the path of subject's native mean B0 image.
+        Returns
+        -------
+        Path
+            Subject's native mean B0 image.
+        """
+        dwi_derivatives = self.diffusion_derivatives_path
+        longitudinal = len([ses for ses in dwi_derivatives.glob("ses-*")]) > 1
+        registrations = dwi_derivatives / self.REGISTERATION_DIRECTORY_PATH
+        if longitudinal:
+            return (
+                registrations / "mean_b0" / "mean_coregistered_mean_b0.nii.gz"
+            )
+        else:
+            return (
+                registrations
+                / "mean_b0"
+                / f"mean_b0_{self.FIRST_SESSION}.nii.gz"
+            )
+
+    def get_epi_to_t1w_transform(self) -> Path:
+        """
+        Returns the path of subject's coregistered mean B0 image.
+        Returns
+        -------
+        Path
+            Subject's coregistered mean B0 image.
+        """
+        coreg_epi = (
+            self.diffusion_derivatives_path
+            / self.FREESURFER_REGISTERATION_PATH
+            / "mean_epi2anatomical.nii.gz"
+        )
+        transform = epi_reg(
+            self.mean_b0, self.preprocessed_t1w, self.t1w_brain, coreg_epi
+        )
+        return transform
+
+    def coregister_tensor(self):
+        """
+        Apply either longitudinal or single-session coregisterations between tensor-derived parameters and preprocessed T1w image
+        """
+        dwi_derivatives = self.diffusion_derivatives_path
+        longitudinal = len([ses for ses in dwi_derivatives.glob("ses-*")]) > 1
+        registerations_dir = (
+            self.diffusion_derivatives_path
+            / self.REGISTERATION_DIRECTORY_PATH
+            / "mean_b0"
+        )
+        fs_dir = (
+            self.diffusion_derivatives_path
+            / self.FREESURFER_REGISTERATION_PATH
+        )
+        epi_to_anatomical = self.get_epi_to_t1w_transform()
+        if longitudinal:
+            coregister_tensors_longitudinal(
+                registerations_dir,
+                fs_dir,
+                self.t1w_brain,
+                epi_to_anatomical,
+                self.get_dwi_paths(),
+            )
+        else:
+            coregister_tensors_single_session(
+                self.t1w_brain,
+                epi_to_anatomical,
+                self.get_dwi_paths(),
+            )
 
     def get_dwi_paths(self) -> dict:
         """
@@ -352,6 +456,10 @@ class SubjectResults:
         return self._results_dict
 
     @property
+    def standard_to_native_transform(self) -> Path:
+        return self.get_standard_to_native_xfm()
+
+    @property
     def gm_mask(self) -> Path:
         return self.get_native_gm_mask()
 
@@ -367,8 +475,13 @@ class SubjectResults:
     def brain_mask(self) -> Path:
         return self.get_brain_mask()
 
+    @property
+    def mean_b0(self) -> Path:
+        return self.get_mean_b0()
+
+
 if __name__ == "__main__":
     base_dir = Path("/media/groot/Yalla/media/MRI")
-    subj_id = "sub-233"
+    subj_id = "sub-670"
     res = SubjectResults(base_dir, subj_id)
-    print(res.get_dwi_paths())
+    print(res.get_mean_b0())
