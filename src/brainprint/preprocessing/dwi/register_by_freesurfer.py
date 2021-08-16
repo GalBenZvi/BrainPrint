@@ -17,7 +17,9 @@ if __name__ == "__main__":
         "/media/groot/Data/Parcellations/MNI/BN_Atlas_274_combined.nii.gz"
     )
     atlas_name = "Brainnetome"
-
+    subjects = [s.name for s in dwi_derivatives.glob("sub-*")]
+    subjects += [s.name for s in func_derivatives.glob("sub-*")]
+    subjects = sorted(set(subjects))
     for subj in sorted(dwi_derivatives.glob("sub-*")):
         print(subj)
         sessions = [
