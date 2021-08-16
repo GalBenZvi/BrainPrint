@@ -1,4 +1,5 @@
 import warnings
+import os
 from collections import defaultdict
 from pathlib import Path
 from typing import Callable, Dict, List
@@ -195,10 +196,14 @@ class SubjectResults:
             if not self.longitudinal
             else ""
         )
-        return (
+        t1w_brain = (
             self.structural_derivatives_path
             / f"{self.subject_id}{buffer}_desc-brain.nii.gz"
         )
+        if not t1w_brain.exists():
+            cmd = f"fslmaths {self.preprocessed_t1w} -mul {self.brain_mask} {t1w_brain}"
+            os.system(cmd)
+        return t1w_brain
 
     def get_mean_b0(self) -> Path:
         """
@@ -240,7 +245,7 @@ class SubjectResults:
         )
         return transform
 
-    def coregister_tensor(self):
+    def coregister_tensors(self):
         """
         Apply either longitudinal or single-session coregisterations between tensor-derived parameters and preprocessed T1w image
         """
@@ -312,6 +317,7 @@ class SubjectResults:
         derivatives_dir = self.diffusion_derivatives_path
         subject_derivatives = defaultdict(dict)
         session_dirs = derivatives_dir.glob(self.SESSION_DIRECTORY_PATTERN)
+        flags = []
         for session_dir in session_dirs:
             session_id = session_dir.name
             tensor_dir = (
@@ -323,6 +329,12 @@ class SubjectResults:
                     subject_derivatives[session_id][
                         parameter
                     ] = derivative_path
+                else:
+                    flags.append(derivative_path)
+        if flags:
+            self.coregister_tensors()
+            # subject_derivatives = self.get_coregistered_dwi_paths()
+
         return subject_derivatives
 
     def get_smri_paths(
@@ -484,4 +496,4 @@ if __name__ == "__main__":
     base_dir = Path("/media/groot/Yalla/media/MRI")
     subj_id = "sub-670"
     res = SubjectResults(base_dir, subj_id)
-    print(res.get_mean_b0())
+    print(res.coregister_tensors())

@@ -2,6 +2,8 @@ import os
 import numpy as np
 import nibabel as nib
 from nipype.interfaces.ants import ApplyTransforms
+from nipype.interfaces import fsl
+from nipype.interfaces import spm
 from pathlib import Path
 
 
@@ -68,10 +70,16 @@ def extract_brain(wholehead: Path, brain: Path, brain_mask: Path):
 
 
 def epi_reg(in_file: Path, t1: Path, t1_brain: Path, out_file: Path):
+    out_mat = out_file.parent / f"{out_file.name.split('.')[0]}.mat"
     if not out_file.exists():
+        out_mat.parent.mkdir(exist_ok=True)
         cmd = f"epi_reg --epi={in_file} --t1={t1} --t1brain={t1_brain} --out={out_file}"
         os.system(cmd)
-    return out_file.parent / f"{out_file.name.split('.')[0]}.mat"
+        if out_mat.exists():
+            return out_mat
+        cmd = f"flirt -in {t1} -ref {in_file} -out trial2.nii.gz -cost mutualinfo -dof 6 -out {out_file} -omat {out_mat}"
+        os.system(cmd)
+    return out_mat
 
 
 def applyxfm_fsl(in_file, xfm, ref, out_file):
