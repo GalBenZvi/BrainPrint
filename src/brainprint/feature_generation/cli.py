@@ -32,17 +32,20 @@ for atlas in [atlas_name]:
     for subj_id in tqdm.tqdm(subj_ids):
         try:
             results = SubjectResults(base_dir, subj_id)
-            flag = out_dir / f"{subj_id}_{results.FIRST_SESSION}.csv"
-            if flag.exists():
-                continue
-            metrics = results.summarize_subject_metrics(atlas_name)
-            for ses, df in metrics.items():
-                df.to_csv(out_dir / f"{subj_id}_{ses}.csv")
-        except:
-            if results.diffusion_derivatives_path.exists():
-                try:
-                    results.coregister_tensors()
-                except:
-                    continue
-            # continue
+            connectomes = results.generate_connectome()
+        except Exception:
+            continue
+            # flag = out_dir / f"{subj_id}_{results.FIRST_SESSION}.csv"
+        #     if flag.exists():
+        #         continue
+        #     metrics = results.summarize_subject_metrics(atlas_name)
+        #     for ses, df in metrics.items():
+        #         df.to_csv(out_dir / f"{subj_id}_{ses}.csv")
+        # except:
+        #     if results.diffusion_derivatives_path.exists():
+        #         try:
+        #             results.coregister_tensors()
+        #         except:
+        #             continue
+        # continue
         # break

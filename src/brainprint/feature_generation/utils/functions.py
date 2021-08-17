@@ -299,7 +299,9 @@ def atlas_to_dwi(
     dwi_parcellation = out_file
     out_file = out_dir / f"{atlas_name}_nodes.mif"
     if not out_file.exists():
-        cmd = f"mrconvert {dwi_parcellation} {out_file} -datatype int64 -force"
+        cmd = (
+            f"mrconvert {dwi_parcellation} {out_file} -datatype uint64 -force"
+        )
         os.system(cmd)
     dwi_nodes = out_file
     return dwi_parcellation, dwi_nodes
@@ -369,7 +371,7 @@ def tractography_pipeline(
     connectomes = {}
     for scale, key in zip([False, True], ["Unscaled", "Scaled"]):
         conn_file = generate_connectome(
-            dwi_parcellation,
+            dwi_nodes,
             sift_tracts,
             out_dir,
             streamlines_post_cleanup,

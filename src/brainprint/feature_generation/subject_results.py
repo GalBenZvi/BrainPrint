@@ -534,6 +534,7 @@ class SubjectResults:
         t2w_dict = self.get_t2w()
         dwi_dict = self.get_original_dwis()
         native_parcellation = self.native_parcellation
+        connectomes_dict = {}
         for dwi_session, functional_session in zip(
             dwi_dict.keys(), anat_coreg_dict.keys()
         ):
@@ -552,7 +553,7 @@ class SubjectResults:
                 / dwi_session
                 / self.TRACTOGRAPHY_DIRECTORY_PATH
             )
-            connectomes = tractography_pipeline(
+            connectomes_dict[dwi_session] = tractography_pipeline(
                 anat_preproc,
                 anat_mask,
                 t1w2epi,
@@ -566,6 +567,7 @@ class SubjectResults:
                 streamlines_post_cleanup,
                 atlas_name,
             )
+        return connectomes_dict
 
     @property
     def bids_path(self) -> Path:
