@@ -39,4 +39,10 @@ for atlas in [atlas_name]:
             for ses, df in metrics.items():
                 df.to_csv(out_dir / f"{subj_id}_{ses}.csv")
         except:
-            continue
+            if results.diffusion_derivatives_path.exists():
+                try:
+                    results.coregister_tensors()
+                except:
+                    continue
+            # continue
+        # break

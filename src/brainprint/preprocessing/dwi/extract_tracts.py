@@ -318,8 +318,8 @@ def generate_connectome(
 
 
 if __name__ == "__main__":
-    mother_dir = Path("/media/groot/Yalla/ConnectomePlasticityProject")
-    bids_dir = mother_dir / "BIDS_dataset"
+    mother_dir = Path("/media/groot/Yalla/media/MRI")
+    bids_dir = mother_dir / "NIfTI"
     derivatives_dir = mother_dir / "derivatives" / "dwiprep"
     atlas_name = "Brainnetome"
     total_streamlines = "5M"
@@ -337,6 +337,7 @@ if __name__ == "__main__":
                 atlas_name=atlas_name,
                 ses=ses.name,
             )
+            print(to_process)
             if not to_process:
                 continue
             if "348" not in subj.name:
@@ -357,5 +358,5 @@ if __name__ == "__main__":
                     atlas_name=atlas_name,
                     scaled=scale,
                 )
-        #     break
-        # break
+            break
+        break

@@ -10,6 +10,7 @@ from brainprint.feature_generation.utils.functions import (
     crop_to_mask,
     epi_reg,
     coregister_tensors_longitudinal,
+    tractography_pipeline,
 )
 import tqdm
 import pandas as pd
@@ -29,6 +30,8 @@ class SubjectResults:
     #: Diffusion imaging preprocessing results.
     REGISTERATION_DIRECTORY_PATH: str = "registrations"
     FREESURFER_REGISTERATION_PATH: str = "registrations/preprocessed_FS"
+    BIAS_CORRECTED_FNAME: str = "bias_corrected.mif"
+    TRACTOGRAPHY_DIRECTORY_PATH: str = "tractography"
     #: Functional imaging preprocessing results.
     FUNCTIONAL_RELATIVE_PATH: str = "derivatives/fmriprep"
     STRUCTURAL_DERIVATIVE_DIR: str = "anat"
@@ -56,6 +59,9 @@ class SubjectResults:
                 self.SESSION_DIRECTORY_PATTERN
             )
         ]
+
+    def get_bids_path(self) -> Path:
+        return self.base_dir / self.BIDS_DIR_NAME / self.subject_id
 
     def get_diffusion_derivatives_path(self) -> Path:
         return self.base_dir / self.DIFFUSION_RELATIVE_PATH / self.subject_id
@@ -98,8 +104,7 @@ class SubjectResults:
         """
         atlas_name = atlas_name or self.DEFAULT_ATLAS_NAME
         coregistered_atlas = (
-            self.native_parcellation.parent
-            / self.native_parcellation.name.replace("_GM", "")
+            self.structural_derivatives_path / f"{atlas_name}_native.nii.gz"
         )
         if not coregistered_atlas.exists():
             at_ants(
@@ -107,8 +112,12 @@ class SubjectResults:
                 self.t1w_brain,
                 self.standard_to_native_transform,
                 coregistered_atlas,
+                nn=True,
             )
-        cropped_to_gm = self.native_parcellation
+        cropped_to_gm = (
+            coregistered_atlas.parent
+            / coregistered_atlas.name.replace(".nii.gz", "_GM.nii.gz")
+        )
         crop_to_mask(coregistered_atlas, self.gm_mask, cropped_to_gm)
 
     def get_standard_to_native_xfm(self) -> Path:
@@ -128,6 +137,35 @@ class SubjectResults:
             self.structural_derivatives_path
             / f"{self.subject_id}{buffer}_from-MNI152NLin2009cAsym_to-T1w_mode-image_xfm.h5"
         )
+
+    def get_native_to_structural_preprocessed_xfm(self) -> Path:
+        """
+        Return the path of the linear transformation between subject's native anatomical space and its preprocessed one
+
+        Returns
+        -------
+        Path
+            The linear transformation between subject's native anatomical space and its preprocessed one
+        """
+        buffer = (
+            f"_{self.structural_derivatives_path.parent.name}"
+            if not self.longitudinal
+            else ""
+        )
+        xfm_dict = {}
+        for ses in self.get_functional_sessions():
+            try:
+                xfm_dict[ses] = [
+                    f
+                    for f in self.structural_derivatives_path.glob(
+                        f"{self.subject_id}_{ses}_*_from-orig_to-T1w_mode-image_xfm.txt"
+                    )
+                    if "uncorrected" not in f.name
+                ][0]
+            except IndexError:
+                xfm_dict[ses] = None
+
+        return xfm_dict
 
     def get_native_gm_mask(self) -> Path:
         """
@@ -164,6 +202,21 @@ class SubjectResults:
             self.structural_derivatives_path
             / f"{self.subject_id}{buffer}_desc-preproc_T1w.nii.gz"
         )
+
+    def get_t2w(self) -> dict:
+        t2w_dict = {}
+        for ses in self.get_functional_sessions():
+            try:
+                t2w_dict[ses] = [
+                    f
+                    for f in self.bids_path.glob(
+                        f"{ses}/anat/{self.subject_id}_{ses}*_T2w.nii.gz"
+                    )
+                    if "uncorrected" not in f.name
+                ][0]
+            except IndexError:
+                t2w_dict[ses] = None
+        return t2w_dict
 
     def get_brain_mask(self) -> Path:
         """
@@ -262,7 +315,7 @@ class SubjectResults:
         )
         epi_to_anatomical = self.get_epi_to_t1w_transform()
         if longitudinal:
-            coregister_tensors_longitudinal(
+            anat2epi = coregister_tensors_longitudinal(
                 registerations_dir,
                 fs_dir,
                 self.t1w_brain,
@@ -270,11 +323,12 @@ class SubjectResults:
                 self.get_dwi_paths(),
             )
         else:
-            coregister_tensors_single_session(
+            anat2epi = coregister_tensors_single_session(
                 self.t1w_brain,
                 epi_to_anatomical,
                 self.get_dwi_paths(),
             )
+        return anat2epi
 
     def get_dwi_paths(self) -> dict:
         """
@@ -333,8 +387,25 @@ class SubjectResults:
                     flags.append(derivative_path)
         if flags:
             self.coregister_tensors()
-            # subject_derivatives = self.get_coregistered_dwi_paths()
 
+        return subject_derivatives
+
+    def get_original_dwis(self) -> dict:
+        """
+        Returns subject's original (4D) DWI files
+        Returns
+        -------
+        dict
+            Subject's original (4D) DWI files
+        """
+        derivatives_dir = self.diffusion_derivatives_path
+        session_dirs = derivatives_dir.glob(self.SESSION_DIRECTORY_PATTERN)
+        subject_derivatives = {}
+        for session in session_dirs:
+            session_id = session.name
+            subject_derivatives[session_id] = (
+                session / self.BIAS_CORRECTED_FNAME
+            )
         return subject_derivatives
 
     def get_smri_paths(
@@ -449,6 +520,57 @@ class SubjectResults:
             subject_metrics[ses] = template_df
         return subject_metrics
 
+    def generate_connectome(
+        self,
+        streamlines_init: str = "5M",
+        streamlines_post_cleanup: str = "1M",
+        atlas_name: str = None,
+    ):
+        atlas_name = atlas_name or self.DEFAULT_ATLAS_NAME
+        anat_preproc = self.preprocessed_t1w
+        anat_mask = self.brain_mask
+        t1w2epi_dict = self.coregister_tensors()
+        anat_coreg_dict = self.get_native_to_structural_preprocessed_xfm()
+        t2w_dict = self.get_t2w()
+        dwi_dict = self.get_original_dwis()
+        native_parcellation = self.native_parcellation
+        for dwi_session, functional_session in zip(
+            dwi_dict.keys(), anat_coreg_dict.keys()
+        ):
+            dwi = dwi_dict.get(dwi_session)
+            t1w2epi = t1w2epi_dict.get(dwi_session)
+            anat_coreg = anat_coreg_dict.get(functional_session)
+            t2w = t2w_dict.get(functional_session)
+            mean_bzero = (
+                self.diffusion_derivatives_path
+                / self.REGISTERATION_DIRECTORY_PATH
+                / "mean_b0"
+                / f"mean_b0_{dwi_session}.nii.gz"
+            )
+            out_dir = (
+                self.diffusion_derivatives_path
+                / dwi_session
+                / self.TRACTOGRAPHY_DIRECTORY_PATH
+            )
+            connectomes = tractography_pipeline(
+                anat_preproc,
+                anat_mask,
+                t1w2epi,
+                anat_coreg,
+                t2w,
+                dwi,
+                native_parcellation,
+                mean_bzero,
+                out_dir,
+                streamlines_init,
+                streamlines_post_cleanup,
+                atlas_name,
+            )
+
+    @property
+    def bids_path(self) -> Path:
+        return self.get_bids_path()
+
     @property
     def diffusion_derivatives_path(self) -> Path:
         return self.get_diffusion_derivatives_path()
@@ -494,6 +616,6 @@ class SubjectResults:
 
 if __name__ == "__main__":
     base_dir = Path("/media/groot/Yalla/media/MRI")
-    subj_id = "sub-670"
+    subj_id = "sub-233"
     res = SubjectResults(base_dir, subj_id)
-    print(res.coregister_tensors())
+    print(res.generate_connectome())
