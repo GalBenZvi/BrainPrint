@@ -294,7 +294,7 @@ def atlas_to_dwi(
 ):
     out_file = out_dir / f"{atlas_name}_in_DWI_space.nii.gz"
     if not out_file.exists():
-        cmd = apply_xfm(atlas, anat2epi, out_file, mean_bzero, nn=True)
+        cmd = apply_xfm(atlas, anat2epi, mean_bzero, out_file, nn=True)
         cmd.run()
     dwi_parcellation = out_file
     out_file = out_dir / f"{atlas_name}_nodes.mif"
