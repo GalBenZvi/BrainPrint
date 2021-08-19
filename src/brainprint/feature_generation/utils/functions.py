@@ -321,7 +321,7 @@ def generate_connectome(
             out_dir / f"{atlas_name}_{num_streamlines}_assignments.txt"
         )
         if (not out_conn.exists()) or (not out_assignments.exists()):
-            cmd = f"tck2connectome {sift_tracts} {atlas} {out_conn} -out_assignments {out_assignments} -symmetric -force"
+            cmd = f"tck2connectome {sift_tracts} {atlas} {out_conn} -out_assignments {out_assignments} -symmetric -nthreads 10 -force"
             os.system(cmd)
     else:
         out_conn = (
@@ -331,7 +331,7 @@ def generate_connectome(
             out_dir / f"{atlas_name}_{num_streamlines}_assignments_scaled.txt"
         )
         if (not out_conn.exists()) or (not out_assignments.exists()):
-            cmd = f"tck2connectome {sift_tracts} {atlas} {out_conn} -out_assignments {out_assignments} -symmetric -scale_invnodevol -force"
+            cmd = f"tck2connectome {sift_tracts} {atlas} {out_conn} -out_assignments {out_assignments} -symmetric -scale_invnodevol -nthreads 10 -force"
             os.system(cmd)
     return out_conn
 
