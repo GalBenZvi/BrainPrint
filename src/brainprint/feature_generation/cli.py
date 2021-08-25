@@ -29,13 +29,14 @@ if not subj_id:
 else:
     subj_ids = [subj_id]
 for atlas in [atlas_name]:
-    for subj_id in tqdm.tqdm(subj_ids):
-        try:
-            results = SubjectResults(base_dir, subj_id)
-            connectomes = results.generate_connectome()
-        except Exception:
-            continue
-            # flag = out_dir / f"{subj_id}_{results.FIRST_SESSION}.csv"
+    for subj_id in tqdm.tqdm(sorted(subj_ids, reverse=True)):
+        print(subj_id)
+        # try:
+        results = SubjectResults(base_dir, subj_id)
+        connectomes = results.generate_connectome()
+        # except Exception:
+        #     continue
+        # flag = out_dir / f"{subj_id}_{results.FIRST_SESSION}.csv"
         #     if flag.exists():
         #         continue
         #     metrics = results.summarize_subject_metrics(atlas_name)

@@ -11,7 +11,7 @@ atlas = {
     "name": "Brainnetome",
 }
 bad_subjects = []
-for subj in sorted(input_dir.glob("sub-*")):
+for subj in sorted(input_dir.glob("sub-*"), reverse=True):
     print("Working on ", subj.name)
     try:
         try:
@@ -22,7 +22,9 @@ for subj in sorted(input_dir.glob("sub-*")):
             anats = sorted([f for f in subj.glob("ses*/anat/*T1w*.nii*")])[0]
         subj_output = output_dir / subj.name
         try:
-            aps = sorted([f for f in subj.glob("ses*/dwi/*.nii*")])[0]
+            aps = sorted([f for f in subj.glob("ses*/dwi/*dir-AP_dwi.nii*")])[
+                0
+            ]
             pas = sorted(
                 [
                     f

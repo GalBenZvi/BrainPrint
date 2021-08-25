@@ -313,9 +313,9 @@ def generate_connectome(
     out_dir: Path,
     num_streamlines: int,
     atlas_name: str = "Brainnetome",
-    scaled: bool = False,
+    scaled: str = "none",
 ):
-    if not scaled:
+    if scaled == "none":
         out_conn = out_dir / f"{atlas_name}_{num_streamlines}_connectome.csv"
         out_assignments = (
             out_dir / f"{atlas_name}_{num_streamlines}_assignments.txt"
@@ -323,7 +323,7 @@ def generate_connectome(
         if (not out_conn.exists()) or (not out_assignments.exists()):
             cmd = f"tck2connectome {sift_tracts} {atlas} {out_conn} -out_assignments {out_assignments} -symmetric -nthreads 10 -force"
             os.system(cmd)
-    else:
+    elif scaled == "vol":
         out_conn = (
             out_dir / f"{atlas_name}_{num_streamlines}_connectome_scaled.csv"
         )
@@ -332,6 +332,18 @@ def generate_connectome(
         )
         if (not out_conn.exists()) or (not out_assignments.exists()):
             cmd = f"tck2connectome {sift_tracts} {atlas} {out_conn} -out_assignments {out_assignments} -symmetric -scale_invnodevol -nthreads 10 -force"
+            os.system(cmd)
+    elif scaled == "length":
+        out_conn = (
+            out_dir
+            / f"{atlas_name}_{num_streamlines}_connectome_streamlines_lengths.csv"
+        )
+        out_assignments = (
+            out_dir
+            / f"{atlas_name}_{num_streamlines}_assignments_streamlines_lengths.txt"
+        )
+        if (not out_conn.exists()) or (not out_assignments.exists()):
+            cmd = f"tck2connectome {sift_tracts} {atlas} {out_conn} -out_assignments {out_assignments} -symmetric -scale_length -stat_edge mean -nthreads 10 -force"
             os.system(cmd)
     return out_conn
 

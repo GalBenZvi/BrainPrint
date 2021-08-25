@@ -291,13 +291,13 @@ def generate_connectome(
     subj_files: dict,
     num_streamlines: int,
     atlas_name: str = "Brainnetome",
-    scaled: bool = False,
+    scaled: str = False,
 ):
     atlas, sift_tracts, out_dir = [
         subj_files.get(key)
         for key in ["dwi_nodes", "sift_tractogram", "out_dir"]
     ]
-    if not scaled:
+    if scaled == "none":
         out_conn = out_dir / f"{atlas_name}_{num_streamlines}_connectome.csv"
         out_assignments = (
             out_dir / f"{atlas_name}_{num_streamlines}_assignments.txt"
@@ -305,7 +305,7 @@ def generate_connectome(
         if (not out_conn.exists()) or (not out_assignments.exists()):
             cmd = f"tck2connectome {sift_tracts} {atlas} {out_conn} -out_assignments {out_assignments} -symmetric -force"
             os.system(cmd)
-    else:
+    elif scaled == "vol":
         out_conn = (
             out_dir / f"{atlas_name}_{num_streamlines}_connectome_scaled.csv"
         )
@@ -314,6 +314,18 @@ def generate_connectome(
         )
         if (not out_conn.exists()) or (not out_assignments.exists()):
             cmd = f"tck2connectome {sift_tracts} {atlas} {out_conn} -out_assignments {out_assignments} -symmetric -scale_invnodevol -force"
+            os.system(cmd)
+    elif scaled == "length":
+        out_conn = (
+            out_dir
+            / f"{atlas_name}_{num_streamlines}_connectome_streamlines_lengths.csv"
+        )
+        out_assignments = (
+            out_dir
+            / f"{atlas_name}_{num_streamlines}_assignments_streamlines_lengths.txt"
+        )
+        if (not out_conn.exists()) or (not out_assignments.exists()):
+            cmd = f"tck2connectome {sift_tracts} {atlas} {out_conn} -out_assignments {out_assignments} -symmetric -scale_length -stat_edge mean -force"
             os.system(cmd)
 
 
@@ -337,6 +349,7 @@ if __name__ == "__main__":
                 atlas_name=atlas_name,
                 ses=ses.name,
             )
+            to_process = True
             print(to_process)
             if not to_process:
                 continue
@@ -351,12 +364,12 @@ if __name__ == "__main__":
             subj_files = sift_cleanup(subj_files, clean_streamlines)
             # subj_files = convert_xfm(subj_files)
             subj_files = atlas_to_dwi(subj_files, atlas_name)
-            for scale in [False, True]:
+            for scale in ["none", "vol", "length"]:
                 generate_connectome(
                     subj_files,
                     num_streamlines=clean_streamlines,
                     atlas_name=atlas_name,
                     scaled=scale,
                 )
-            break
-        break
+        #     break
+        # break
