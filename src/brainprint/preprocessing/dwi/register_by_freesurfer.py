@@ -20,6 +20,8 @@ if __name__ == "__main__":
     subjects = [s.name for s in dwi_derivatives.glob("sub-*")]
     subjects += [s.name for s in func_derivatives.glob("sub-*")]
     subjects = sorted(set(subjects))
+    cur_subjects = [f"sub-{i}" for i in [289, 298, 692, 693]]
+    subjects = [subj for subj in subjects if subj in cur_subjects]
     for subj in sorted(dwi_derivatives.glob("sub-*")):
         print(subj)
         sessions = [

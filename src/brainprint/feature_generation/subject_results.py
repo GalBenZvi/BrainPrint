@@ -89,6 +89,7 @@ class SubjectResults:
             )
             try:
                 self.coregister_atlas_to_native(atlas_name)
+                return path
             except Exception:
                 warnings.warn(f"Native GM parcellation was unsuccessful")
         else:
@@ -379,13 +380,11 @@ class SubjectResults:
             )
             for parameter in self.PARAMETERS.get(Modality.DIFFUSION):
                 derivative_path = tensor_dir / f"{parameter}.nii.gz"
-                if derivative_path.exists():
-                    subject_derivatives[session_id][
-                        parameter
-                    ] = derivative_path
-                else:
+
+                subject_derivatives[session_id][parameter] = derivative_path
+                if not derivative_path.exists():
                     flags.append(derivative_path)
-        if flags:
+        if any(flags):
             self.coregister_tensors()
 
         return subject_derivatives
@@ -436,6 +435,8 @@ class SubjectResults:
                 subject_derivatives[self.FIRST_SESSION][
                     parameter
                 ] = derivative_path
+            else:
+                subject_derivatives[self.FIRST_SESSION][parameter] = None
         return subject_derivatives
 
     def get_derivative_dict(self, atlas_name: str = None) -> dict:
@@ -510,13 +511,18 @@ class SubjectResults:
             template_df = pd.read_csv(
                 parcellations.get("Brainnetome").get("labels"), index_col=0
             ).copy()
+
             for key in self.derivative_dict.keys():
-                for metric, path in (
+                for metric, path in tqdm.tqdm(
                     self.derivative_dict.get(key).get(ses).items()
                 ):
-                    template_df[metric] = self.parcellate_metric(
-                        path, atlas_data, template_df
-                    )
+                    try:
+                        template_df[metric] = self.parcellate_metric(
+                            path, atlas_data, template_df
+                        )
+                    except AttributeError:
+                        continue
+                break
             subject_metrics[ses] = template_df
         return subject_metrics
 

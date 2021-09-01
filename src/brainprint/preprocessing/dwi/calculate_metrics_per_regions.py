@@ -150,23 +150,26 @@ def parcellate_subjects_data(
     norm_method: str = "CAT",
     coreg_dirname: str = "coregistered",
 ):
+    cur_subjects = [f"sub-{i}" for i in [289, 298, 692, 693]]
     subjects_dict = {}
     for subj in sorted(derivatives_dir.glob("sub-*")):
-        print(subj.name)
-        try:
-            subj_data = {}
-            native_parcels_full, gm_mask = gather_subject_data(
-                derivatives_dir, subj.name, atlas_name, norm_method
-            )
-            if not native_parcels_full:
-                continue
-            native_parcels = crop_to_gm(native_parcels_full, gm_mask)
-            atlas_data = nib.load(native_parcels).get_fdata()
-        except FileNotFoundError:
-            print(
-                f"No {atlas_name} native parcellation found for {subj.name}!"
-            )
+        if not subj.name in cur_subjects:
             continue
+        print(subj.name)
+        # try:
+        subj_data = {}
+        native_parcels_full, gm_mask = gather_subject_data(
+            derivatives_dir, subj.name, atlas_name, norm_method
+        )
+        if not native_parcels_full:
+            continue
+        native_parcels = crop_to_gm(native_parcels_full, gm_mask)
+        atlas_data = nib.load(native_parcels).get_fdata()
+        # except FileNotFoundError:
+        # print(
+        #     f"No {atlas_name} native parcellation found for {subj.name}!"
+        # )
+        # continue
         for session in subj.glob("ses-*"):
             print(session.name)
             session_df = atlas_parcels.copy()

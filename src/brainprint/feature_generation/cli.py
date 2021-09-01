@@ -1,4 +1,5 @@
 import argparse
+from sys import flags
 import tqdm
 from pathlib import Path
 from brainprint.feature_generation.subject_results import SubjectResults
@@ -33,7 +34,15 @@ for atlas in [atlas_name]:
         print(subj_id)
         # try:
         results = SubjectResults(base_dir, subj_id)
+        flag = out_dir / f"{subj_id}_{results.FIRST_SESSION}.csv"
+        if flag.exists():
+            continue
+        metrics = results.summarize_subject_metrics()
+        for ses, df in metrics.items():
+            df.to_csv(out_dir / f"{subj_id}_{ses}.csv")
         connectomes = results.generate_connectome()
+        # metrics.to_csv(out_dir / f"{subj_id}_{ses}.csv")
+        #
         # except Exception:
         #     continue
         # flag = out_dir / f"{subj_id}_{results.FIRST_SESSION}.csv"

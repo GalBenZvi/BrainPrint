@@ -125,7 +125,8 @@ def coregister_tensors_longitudinal(
             out_file = param_nii.parent.parent / "coreg_FS" / param_nii.name
             out_file.parent.mkdir(exist_ok=True)
             if not out_file.exists():
-                apply_xfm(param_nii, aff_full, fs_brain, out_file)
+                runner = apply_xfm(param_nii, aff_full, fs_brain, out_file)
+                runner.run()
     return aff_dict
 
 
@@ -147,7 +148,8 @@ def coregister_tensors_single_session(
         out_file = param_nii.parent.parent / "coreg_FS" / param_nii.name
         out_file.parent.mkdir(exist_ok=True)
         if not out_file.exists():
-            apply_xfm(param_nii, mean_epi_to_t1w, fs_brain, out_file)
+            runner = apply_xfm(param_nii, mean_epi_to_t1w, fs_brain, out_file)
+            runner.run()
     return aff_dict
 
 
@@ -171,9 +173,10 @@ def gen_5tt(anat, t2, anat_coreg, mask):
         cmd.run()
     out_file = anat.with_name("5TT_nocoreg.mif")
     if not out_file.exists():
-        cmd = (
-            f"5ttgen fsl {anat} {out_file} -t2 {t2_coreg} -mask {mask} -force"
-        )
+        # cmd = (
+        #     f"5ttgen fsl {anat} {out_file} -t2 {t2_coreg} -mask {mask} -force"
+        # )
+        cmd = f"5ttgen fsl {anat} {out_file} -mask {mask} -force"
         print(cmd)
         os.system(cmd)
         if not out_file.exists():
@@ -265,7 +268,7 @@ def perform_tractography(
     five_tissue = coreg_anat.get("5TT_coreg")
     tractogram = out_dir / f"{num_streamlines}.tck"
     if not tractogram.exists():
-        cmd = f"tckgen {fods.get('WM_norm')} {tractogram} -algorithm SD_Stream -act {five_tissue} -minlength 30 -maxlength 500 -crop_at_gmwmi -seed_dynamic {fods.get('WM')} -select {num_streamlines} -force"
+        cmd = f"tckgen {fods.get('WM_norm')} {tractogram} -algorithm SD_Stream -act {five_tissue} -minlength 30 -maxlength 500 -crop_at_gmwmi -seed_dynamic {fods.get('WM_norm')} -select {num_streamlines} -force"
         os.system(cmd)
     return tractogram
 
@@ -381,7 +384,10 @@ def tractography_pipeline(
         native_parcellation, t1w2epi, mean_bzero, out_dir, atlas_name
     )
     connectomes = {}
-    for scale, key in zip([False, True], ["Unscaled", "Scaled"]):
+    for scale, key in zip(
+        ["none", "vol", "length"],
+        ["Unscaled", "Scaled_ROI_vol", "Scaled_streamlines_length"],
+    ):
         conn_file = generate_connectome(
             dwi_nodes,
             sift_tracts,
