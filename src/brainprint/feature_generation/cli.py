@@ -32,15 +32,18 @@ else:
 for atlas in [atlas_name]:
     for subj_id in tqdm.tqdm(sorted(subj_ids, reverse=True)):
         print(subj_id)
-        # try:
-        results = SubjectResults(base_dir, subj_id)
-        flag = out_dir / f"{subj_id}_{results.FIRST_SESSION}.csv"
-        if flag.exists():
+        try:
+            results = SubjectResults(base_dir, subj_id)
+            flag = out_dir / f"{subj_id}_{results.FIRST_SESSION}.csv"
+            # if flag.exists():
+            #     continue
+            metrics = results.summarize_subject_metrics()
+            for ses, df in metrics.items():
+                df.to_csv(out_dir / f"{subj_id}_{ses}.csv")
+            connectomes = results.generate_connectome()
+        except:
+            print(f"Unable to find necessary files for subject {subj_id}")
             continue
-        metrics = results.summarize_subject_metrics()
-        for ses, df in metrics.items():
-            df.to_csv(out_dir / f"{subj_id}_{ses}.csv")
-        connectomes = results.generate_connectome()
         # metrics.to_csv(out_dir / f"{subj_id}_{ses}.csv")
         #
         # except Exception:

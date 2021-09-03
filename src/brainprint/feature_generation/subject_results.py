@@ -72,7 +72,6 @@ class SubjectResults:
     def get_structural_derivatives_path(self) -> Path:
         functional = self.get_functional_derivatives_path()
         sessions = list(functional.glob(self.SESSION_DIRECTORY_PATTERN))
-
         if not sessions:
             return
         self.longitudinal = len(sessions) > 1
@@ -522,7 +521,6 @@ class SubjectResults:
                         )
                     except AttributeError:
                         continue
-                break
             subject_metrics[ses] = template_df
         return subject_metrics
 

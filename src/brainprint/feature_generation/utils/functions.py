@@ -81,7 +81,7 @@ def epi_reg(in_file: Path, t1: Path, t1_brain: Path, out_file: Path):
         os.system(cmd)
         if out_mat.exists():
             return out_mat
-        cmd = f"flirt -in {t1} -ref {in_file} -out trial2.nii.gz -cost mutualinfo -dof 6 -out {out_file} -omat {out_mat}"
+        cmd = f"flirt -in {t1} -ref {in_file} -cost mutualinfo -dof 6 -out {out_file} -omat {out_mat}"
         os.system(cmd)
     return out_mat
 
